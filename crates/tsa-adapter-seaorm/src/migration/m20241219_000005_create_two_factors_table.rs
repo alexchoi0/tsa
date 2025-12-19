@@ -1,5 +1,7 @@
 use sea_orm_migration::{prelude::*, schema::*};
 
+use super::m20241219_000001_create_users_table::Users;
+
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
@@ -59,10 +61,4 @@ pub enum TwoFactors {
     Verified,
     CreatedAt,
     UpdatedAt,
-}
-
-#[derive(DeriveIden)]
-pub enum Users {
-    Table,
-    Id,
 }

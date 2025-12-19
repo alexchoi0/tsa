@@ -1,6 +1,6 @@
 use sea_orm_migration::{prelude::*, schema::*};
 
-use crate::m20241219_000001_create_users_table::Users;
+use super::m20241219_000001_create_users_table::Users;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -17,15 +17,10 @@ impl MigrationTrait for Migration {
                     .col(uuid(Accounts::UserId).not_null())
                     .col(string(Accounts::Provider).not_null())
                     .col(string(Accounts::ProviderAccountId).not_null())
-                    .col(string_null(Accounts::PasswordHash))
                     .col(text_null(Accounts::AccessToken))
                     .col(text_null(Accounts::RefreshToken))
                     .col(timestamp_with_time_zone_null(Accounts::ExpiresAt))
-                    .col(string_null(Accounts::TokenType))
-                    .col(string_null(Accounts::Scope))
-                    .col(text_null(Accounts::IdToken))
                     .col(timestamp_with_time_zone(Accounts::CreatedAt).not_null())
-                    .col(timestamp_with_time_zone(Accounts::UpdatedAt).not_null())
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_accounts_user_id")
@@ -74,13 +69,8 @@ pub enum Accounts {
     UserId,
     Provider,
     ProviderAccountId,
-    PasswordHash,
     AccessToken,
     RefreshToken,
     ExpiresAt,
-    TokenType,
-    Scope,
-    IdToken,
     CreatedAt,
-    UpdatedAt,
 }

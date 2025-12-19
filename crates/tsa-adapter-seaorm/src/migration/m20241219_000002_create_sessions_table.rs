@@ -1,6 +1,6 @@
 use sea_orm_migration::{prelude::*, schema::*};
 
-use crate::m20241219_000001_create_users_table::Users;
+use super::m20241219_000001_create_users_table::Users;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

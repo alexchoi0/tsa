@@ -16,7 +16,6 @@ members = [
     "crates/tsa-adapter-bigtable",
     "crates/tsa-axum",
     "crates/tsa-cli",
-    "migration",
 ]
 
 [workspace.package]

@@ -14,6 +14,8 @@ impl MigrationTrait for Migration {
                     .col(uuid(Users::Id).primary_key())
                     .col(string(Users::Email).unique_key().not_null())
                     .col(boolean(Users::EmailVerified).not_null().default(false))
+                    .col(string_null(Users::Phone))
+                    .col(boolean(Users::PhoneVerified).not_null().default(false))
                     .col(string_null(Users::Name))
                     .col(string_null(Users::Image))
                     .col(timestamp_with_time_zone(Users::CreatedAt).not_null())
@@ -28,6 +30,16 @@ impl MigrationTrait for Migration {
                     .name("idx_users_email")
                     .table(Users::Table)
                     .col(Users::Email)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .name("idx_users_phone")
+                    .table(Users::Table)
+                    .col(Users::Phone)
                     .to_owned(),
             )
             .await
@@ -46,6 +58,8 @@ pub enum Users {
     Id,
     Email,
     EmailVerified,
+    Phone,
+    PhoneVerified,
     Name,
     Image,
     CreatedAt,
