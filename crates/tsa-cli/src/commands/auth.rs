@@ -92,7 +92,7 @@ pub async fn signout(client: &TsaClient) -> Result<()> {
 pub async fn status(client: &TsaClient) -> Result<()> {
     let config = CliConfig::load()?;
 
-    if config.token.is_none() {
+    if config.token().is_none() {
         println!("{}", "Not signed in".yellow().bold());
         return Ok(());
     }

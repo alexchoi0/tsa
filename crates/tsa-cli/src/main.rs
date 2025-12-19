@@ -1,5 +1,4 @@
 use clap::{Parser, Subcommand};
-use colored::Colorize;
 
 mod commands;
 mod config;
@@ -12,8 +11,8 @@ struct Cli {
     #[command(subcommand)]
     command: Commands,
 
-    #[arg(long, global = true, env = "TSA_SERVER_URL", default_value = "http://localhost:3000")]
-    server: String,
+    #[arg(short = 'c', long, global = true, env = "TSA_CONTEXT")]
+    context: Option<String>,
 }
 
 #[derive(Subcommand)]
@@ -57,7 +56,7 @@ enum Commands {
         command: ApiKeyCommands,
     },
 
-    #[command(about = "Configure CLI settings")]
+    #[command(about = "Configure CLI settings and contexts")]
     Config {
         #[command(subcommand)]
         command: ConfigCommands,
@@ -205,21 +204,50 @@ enum ApiKeyCommands {
 
 #[derive(Subcommand)]
 enum ConfigCommands {
-    #[command(about = "Set a configuration value")]
-    Set {
-        key: String,
-        value: String,
+    #[command(about = "Create or update a context")]
+    SetContext {
+        #[arg(help = "Context name")]
+        name: String,
+        #[arg(short, long, help = "Server URL")]
+        server: String,
     },
 
-    #[command(about = "Get a configuration value")]
-    Get {
-        key: String,
+    #[command(about = "Switch to a context")]
+    UseContext {
+        #[arg(help = "Context name")]
+        name: String,
+    },
+
+    #[command(about = "List all contexts")]
+    GetContexts,
+
+    #[command(about = "Show current context name")]
+    CurrentContext,
+
+    #[command(about = "Delete a context")]
+    DeleteContext {
+        #[arg(help = "Context name")]
+        name: String,
+    },
+
+    #[command(about = "Rename a context")]
+    RenameContext {
+        #[arg(help = "Old context name")]
+        old_name: String,
+        #[arg(help = "New context name")]
+        new_name: String,
+    },
+
+    #[command(about = "Set auth token for current context")]
+    SetToken {
+        #[arg(help = "Authentication token")]
+        token: String,
     },
 
     #[command(about = "Show all configuration")]
     Show,
 
-    #[command(about = "Initialize configuration")]
+    #[command(about = "Initialize configuration with default context")]
     Init,
 }
 
@@ -235,14 +263,21 @@ async fn main() -> anyhow::Result<()> {
         .init();
 
     let cli = Cli::parse();
-    let config = config::CliConfig::load()?;
+    let mut cfg = config::CliConfig::load()?;
+
+    if let Some(ctx_name) = &cli.context {
+        cfg.use_context(ctx_name)?;
+    }
+
+    let server_url = cfg.server_url().unwrap_or("http://localhost:3000");
+    let token = cfg.token();
 
     match cli.command {
         Commands::Server { port, host } => {
             commands::server::run(host, port).await?;
         }
         Commands::Auth { command } => {
-            let client = client::TsaClient::new(&cli.server, config.token.as_deref());
+            let client = client::TsaClient::new(server_url, token);
             match command {
                 AuthCommands::Signup { email, password, name } => {
                     commands::auth::signup(&client, &email, &password, name.as_deref()).await?;
@@ -259,7 +294,7 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::User { command } => {
-            let client = client::TsaClient::new(&cli.server, config.token.as_deref());
+            let client = client::TsaClient::new(server_url, token);
             match command {
                 UserCommands::Me => {
                     commands::user::me(&client).await?;
@@ -273,7 +308,7 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Org { command } => {
-            let client = client::TsaClient::new(&cli.server, config.token.as_deref());
+            let client = client::TsaClient::new(server_url, token);
             match command {
                 OrgCommands::List => {
                     commands::org::list(&client).await?;
@@ -299,7 +334,7 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Session { command } => {
-            let client = client::TsaClient::new(&cli.server, config.token.as_deref());
+            let client = client::TsaClient::new(server_url, token);
             match command {
                 SessionCommands::List => {
                     commands::session::list(&client).await?;
@@ -313,7 +348,7 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::ApiKey { command } => {
-            let client = client::TsaClient::new(&cli.server, config.token.as_deref());
+            let client = client::TsaClient::new(server_url, token);
             match command {
                 ApiKeyCommands::List => {
                     commands::apikey::list(&client).await?;
@@ -328,11 +363,26 @@ async fn main() -> anyhow::Result<()> {
         }
         Commands::Config { command } => {
             match command {
-                ConfigCommands::Set { key, value } => {
-                    commands::config::set(&key, &value)?;
+                ConfigCommands::SetContext { name, server } => {
+                    commands::config::set_context(&name, &server)?;
                 }
-                ConfigCommands::Get { key } => {
-                    commands::config::get(&key)?;
+                ConfigCommands::UseContext { name } => {
+                    commands::config::use_context(&name)?;
+                }
+                ConfigCommands::GetContexts => {
+                    commands::config::get_contexts()?;
+                }
+                ConfigCommands::CurrentContext => {
+                    commands::config::current_context()?;
+                }
+                ConfigCommands::DeleteContext { name } => {
+                    commands::config::delete_context(&name)?;
+                }
+                ConfigCommands::RenameContext { old_name, new_name } => {
+                    commands::config::rename_context(&old_name, &new_name)?;
+                }
+                ConfigCommands::SetToken { token } => {
+                    commands::config::set_token(&token)?;
                 }
                 ConfigCommands::Show => {
                     commands::config::show()?;
@@ -343,7 +393,7 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Health => {
-            let client = client::TsaClient::new(&cli.server, None);
+            let client = client::TsaClient::new(server_url, None);
             commands::health::check(&client).await?;
         }
     }
