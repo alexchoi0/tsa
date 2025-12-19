@@ -25,5 +25,6 @@ anyhow = { workspace = true }
 colored = { workspace = true }
 tabled = { workspace = true }
 dirs = { workspace = true }
+toml = "0.8"
 dotenvy = "0.15"
 dialoguer = "0.11"

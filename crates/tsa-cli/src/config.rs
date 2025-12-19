@@ -17,14 +17,14 @@ impl CliConfig {
     }
 
     pub fn config_path() -> PathBuf {
-        Self::config_dir().join("config.json")
+        Self::config_dir().join("config.toml")
     }
 
     pub fn load() -> Result<Self> {
         let path = Self::config_path();
         if path.exists() {
             let content = fs::read_to_string(&path)?;
-            Ok(serde_json::from_str(&content)?)
+            Ok(toml::from_str(&content)?)
         } else {
             Ok(Self::default())
         }
@@ -36,7 +36,7 @@ impl CliConfig {
             fs::create_dir_all(&dir)?;
         }
 
-        let content = serde_json::to_string_pretty(self)?;
+        let content = toml::to_string_pretty(self)?;
         fs::write(Self::config_path(), content)?;
         Ok(())
     }
