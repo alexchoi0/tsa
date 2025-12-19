@@ -1,0 +1,13 @@
+[package]
+name = "migration"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+async-std = { version = "1", features = ["attributes", "tokio1"] }
+sea-orm-migration.workspace = true
+
+[[bin]]
+name = "migrate"
+path = "src/main.rs"

@@ -1,0 +1,23 @@
+pub mod account;
+pub mod api_key;
+pub mod organization;
+pub mod organization_invitation;
+pub mod organization_member;
+pub mod passkey;
+pub mod passkey_challenge;
+pub mod session;
+pub mod two_factor;
+pub mod user;
+pub mod verification_token;
+
+pub use account::Entity as Account;
+pub use api_key::Entity as ApiKey;
+pub use organization::Entity as Organization;
+pub use organization_invitation::Entity as OrganizationInvitation;
+pub use organization_member::Entity as OrganizationMember;
+pub use passkey::Entity as Passkey;
+pub use passkey_challenge::Entity as PasskeyChallenge;
+pub use session::Entity as Session;
+pub use two_factor::Entity as TwoFactor;
+pub use user::Entity as User;
+pub use verification_token::Entity as VerificationToken;

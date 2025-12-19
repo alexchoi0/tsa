@@ -1,0 +1,59 @@
+[package]
+name = "tsa"
+description = "TSA - Tokens, Sessions, Authentication for Rust"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = ["oauth", "totp"]
+oauth = ["dep:tsa-oauth"]
+totp = ["dep:totp-rs"]
+passkey = ["dep:webauthn-rs", "dep:webauthn-rs-proto"]
+enterprise = ["dep:tsa-enterprise"]
+axum = ["dep:axum", "dep:axum-extra", "dep:tower", "dep:tower-http", "dep:http"]
+
+# Database adapters - if none specified, uses in-memory adapter
+adapter-seaorm = ["dep:tsa-adapter-seaorm"]
+adapter-mongodb = ["dep:tsa-adapter-mongodb"]
+adapter-dynamodb = ["dep:tsa-adapter-dynamodb"]
+adapter-firestore = ["dep:tsa-adapter-firestore"]
+adapter-bigtable = ["dep:tsa-adapter-bigtable"]
+adapter-redis = ["dep:tsa-adapter-redis"]
+
+[dependencies]
+tsa-core.workspace = true
+tsa-token.workspace = true
+tsa-session.workspace = true
+tsa-adapter.workspace = true
+
+argon2.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+rand.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+base64.workspace = true
+sha2.workspace = true
+
+tsa-oauth = { workspace = true, optional = true }
+tsa-enterprise = { workspace = true, optional = true }
+totp-rs = { workspace = true, optional = true }
+webauthn-rs = { workspace = true, optional = true }
+webauthn-rs-proto = { workspace = true, optional = true }
+axum = { workspace = true, optional = true }
+axum-extra = { workspace = true, optional = true }
+tower = { workspace = true, optional = true }
+tower-http = { workspace = true, optional = true }
+http = { workspace = true, optional = true }
+
+# Database adapter dependencies (optional)
+tsa-adapter-seaorm = { workspace = true, optional = true }
+tsa-adapter-mongodb = { workspace = true, optional = true }
+tsa-adapter-dynamodb = { workspace = true, optional = true }
+tsa-adapter-firestore = { workspace = true, optional = true }
+tsa-adapter-bigtable = { workspace = true, optional = true }
+tsa-adapter-redis = { workspace = true, optional = true }

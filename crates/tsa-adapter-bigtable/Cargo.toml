@@ -1,0 +1,18 @@
+[package]
+name = "tsa-adapter-bigtable"
+description = "Google Bigtable adapter for TSA (Tokens, Sessions, Authentication)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tsa-core.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+tokio.workspace = true
+thiserror.workspace = true
+gcloud-sdk = { version = "0.28", features = ["google-bigtable-v2"] }
+tonic = "0.14"

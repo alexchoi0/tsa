@@ -1,0 +1,25 @@
+mod apple;
+mod discord;
+mod facebook;
+mod github;
+mod gitlab;
+mod google;
+mod linkedin;
+mod microsoft;
+mod slack;
+mod spotify;
+mod twitch;
+mod twitter;
+
+pub use apple::AppleProvider;
+pub use discord::DiscordProvider;
+pub use facebook::FacebookProvider;
+pub use github::GitHubProvider;
+pub use gitlab::GitLabProvider;
+pub use google::GoogleProvider;
+pub use linkedin::LinkedInProvider;
+pub use microsoft::MicrosoftProvider;
+pub use slack::SlackProvider;
+pub use spotify::SpotifyProvider;
+pub use twitch::TwitchProvider;
+pub use twitter::TwitterProvider;
