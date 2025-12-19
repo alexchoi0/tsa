@@ -41,10 +41,12 @@ pub async fn signup(client: &TsaClient, email: &str, password: &str, name: Optio
     let response: AuthResponse = client.post("/auth/signup", &req).await?;
 
     let mut config = CliConfig::load()?;
+    let ctx_name = config.current_context.clone().unwrap_or_else(|| "default".to_string());
     config.set_token(Some(response.token))?;
 
     println!("{}", "Account created successfully!".green().bold());
     println!();
+    println!("  {} {}", "Context:".dimmed(), ctx_name.cyan());
     println!("  {} {}", "User ID:".dimmed(), response.user.id);
     println!("  {} {}", "Email:".dimmed(), response.user.email);
     if let Some(name) = response.user.name {
@@ -63,10 +65,12 @@ pub async fn signin(client: &TsaClient, email: &str, password: &str) -> Result<(
     let response: AuthResponse = client.post("/auth/signin", &req).await?;
 
     let mut config = CliConfig::load()?;
+    let ctx_name = config.current_context.clone().unwrap_or_else(|| "default".to_string());
     config.set_token(Some(response.token))?;
 
     println!("{}", "Signed in successfully!".green().bold());
     println!();
+    println!("  {} {}", "Context:".dimmed(), ctx_name.cyan());
     println!("  {} {}", "User ID:".dimmed(), response.user.id);
     println!("  {} {}", "Email:".dimmed(), response.user.email);
 
@@ -82,15 +86,25 @@ pub async fn signout(client: &TsaClient) -> Result<()> {
     let _: MessageResponse = client.post("/auth/signout", &serde_json::json!({})).await?;
 
     let mut config = CliConfig::load()?;
+    let ctx_name = config.current_context.clone().unwrap_or_else(|| "default".to_string());
     config.set_token(None)?;
 
     println!("{}", "Signed out successfully!".green().bold());
+    println!("  {} {}", "Context:".dimmed(), ctx_name.cyan());
 
     Ok(())
 }
 
 pub async fn status(client: &TsaClient) -> Result<()> {
     let config = CliConfig::load()?;
+    let ctx_name = config.current_context.clone().unwrap_or_else(|| "default".to_string());
+
+    println!("{}", "Context".blue().bold());
+    println!("  {} {}", "Name:".dimmed(), ctx_name.cyan());
+    if let Some(ctx) = config.current_context() {
+        println!("  {} {}", "Server:".dimmed(), ctx.server_url);
+    }
+    println!();
 
     if config.token().is_none() {
         println!("{}", "Not signed in".yellow().bold());
