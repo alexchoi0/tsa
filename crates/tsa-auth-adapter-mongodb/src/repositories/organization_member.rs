@@ -18,16 +18,13 @@ impl MongoDbOrganizationMemberRepository {
 #[async_trait]
 impl OrganizationMemberRepository for MongoDbOrganizationMemberRepository {
     async fn create(&self, member: &OrganizationMember) -> Result<OrganizationMember> {
-        self.collection
-            .insert_one(member)
-            .await
-            .map_err(|e| {
-                if e.to_string().contains("duplicate key") {
-                    TsaError::AlreadyOrganizationMember
-                } else {
-                    TsaError::Database(e.to_string())
-                }
-            })?;
+        self.collection.insert_one(member).await.map_err(|e| {
+            if e.to_string().contains("duplicate key") {
+                TsaError::AlreadyOrganizationMember
+            } else {
+                TsaError::Database(e.to_string())
+            }
+        })?;
         Ok(member.clone())
     }
 
@@ -52,10 +49,7 @@ impl OrganizationMemberRepository for MongoDbOrganizationMemberRepository {
             .map_err(|e| TsaError::Database(e.to_string()))
     }
 
-    async fn find_by_organization(
-        &self,
-        organization_id: Uuid,
-    ) -> Result<Vec<OrganizationMember>> {
+    async fn find_by_organization(&self, organization_id: Uuid) -> Result<Vec<OrganizationMember>> {
         let cursor = self
             .collection
             .find(doc! { "organization_id": organization_id })

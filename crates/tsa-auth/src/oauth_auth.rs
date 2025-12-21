@@ -4,8 +4,8 @@ use tsa_auth_core::{
 };
 use uuid::Uuid;
 
-use tsa_auth_oauth::{OAuthRegistry, OAuthTokens, OAuthUserInfo, ProviderConfig};
 use crate::{Auth, AuthCallbacks};
+use tsa_auth_oauth::{OAuthRegistry, OAuthTokens, OAuthUserInfo, ProviderConfig};
 
 pub struct OAuthResult {
     pub user: User,
@@ -56,7 +56,12 @@ impl<A: Adapter, C: AuthCallbacks> AuthWithOAuth<A, C> {
             "spotify" => self.oauth.register_spotify(config)?,
             "slack" => self.oauth.register_slack(config)?,
             "twitch" => self.oauth.register_twitch(config)?,
-            _ => return Err(TsaError::Configuration(format!("Unknown provider: {}", name))),
+            _ => {
+                return Err(TsaError::Configuration(format!(
+                    "Unknown provider: {}",
+                    name
+                )))
+            }
         }
 
         Ok(self)
@@ -72,7 +77,8 @@ impl<A: Adapter, C: AuthCallbacks> AuthWithOAuth<A, C> {
         code: &str,
         state: &str,
     ) -> Result<OAuthResult> {
-        self.oauth_callback_with_context(provider, code, state, None, None).await
+        self.oauth_callback_with_context(provider, code, state, None, None)
+            .await
     }
 
     pub async fn oauth_callback_with_context(
@@ -127,7 +133,12 @@ impl<A: Adapter, C: AuthCallbacks> AuthWithOAuth<A, C> {
     }
 
     pub async fn oauth_unlink(&self, user_id: Uuid, provider: &str) -> Result<()> {
-        let accounts = self.auth.adapter.accounts().find_by_user_id(user_id).await?;
+        let accounts = self
+            .auth
+            .adapter
+            .accounts()
+            .find_by_user_id(user_id)
+            .await?;
 
         let has_credential = accounts.iter().any(|a| a.provider == "credential");
         let oauth_count = accounts
@@ -210,9 +221,10 @@ impl<A: Adapter, C: AuthCallbacks> AuthWithOAuth<A, C> {
         let now = Utc::now();
         let user = User {
             id: Uuid::new_v4(),
-            email: user_info.email.clone().unwrap_or_else(|| {
-                format!("{}@{}.oauth", user_info.provider_user_id, provider)
-            }),
+            email: user_info
+                .email
+                .clone()
+                .unwrap_or_else(|| format!("{}@{}.oauth", user_info.provider_user_id, provider)),
             email_verified: user_info.email_verified.unwrap_or(false),
             phone: None,
             phone_verified: false,
@@ -330,7 +342,9 @@ impl<A: Adapter, C: AuthCallbacks> AuthWithOAuth<A, C> {
         ip_address: Option<String>,
         user_agent: Option<String>,
     ) -> Result<(User, Session, String)> {
-        self.auth.signin(email, password, ip_address, user_agent).await
+        self.auth
+            .signin(email, password, ip_address, user_agent)
+            .await
     }
 
     pub async fn signout(&self, session_token: &str) -> Result<()> {

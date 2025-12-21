@@ -2,7 +2,9 @@ use chrono::Duration;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-pub use tsa_auth_core::{ApprovalDecision, ApprovalRequest, ApprovalResponse, ApprovalStatus, ApprovalToken};
+pub use tsa_auth_core::{
+    ApprovalDecision, ApprovalRequest, ApprovalResponse, ApprovalStatus, ApprovalToken,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateApprovalRequest {

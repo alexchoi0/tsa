@@ -17,16 +17,13 @@ impl MongoDbUserRepository {
 #[async_trait]
 impl UserRepository for MongoDbUserRepository {
     async fn create(&self, user: &User) -> Result<User> {
-        self.collection
-            .insert_one(user)
-            .await
-            .map_err(|e| {
-                if e.to_string().contains("duplicate key") {
-                    TsaError::UserAlreadyExists
-                } else {
-                    TsaError::Database(e.to_string())
-                }
-            })?;
+        self.collection.insert_one(user).await.map_err(|e| {
+            if e.to_string().contains("duplicate key") {
+                TsaError::UserAlreadyExists
+            } else {
+                TsaError::Database(e.to_string())
+            }
+        })?;
         Ok(user.clone())
     }
 

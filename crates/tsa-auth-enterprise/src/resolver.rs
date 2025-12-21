@@ -71,34 +71,47 @@ impl RbacResolver {
     pub fn check_permission(&self, role: &str, permission: &str) -> PermissionCheck {
         let permissions = match self.resolved_permissions.get(role) {
             Some(p) => p,
-            None => return PermissionCheck { allowed: false, requires_approval: None },
+            None => {
+                return PermissionCheck {
+                    allowed: false,
+                    requires_approval: None,
+                }
+            }
         };
 
         if permissions.contains("*") {
-            return PermissionCheck { allowed: true, requires_approval: None };
+            return PermissionCheck {
+                allowed: true,
+                requires_approval: None,
+            };
         }
 
         if permissions.contains(permission) {
             let approval = self.get_approval_requirement(role, permission);
-            return PermissionCheck { allowed: true, requires_approval: approval };
+            return PermissionCheck {
+                allowed: true,
+                requires_approval: approval,
+            };
         }
 
         if let Some((resource, _)) = permission.split_once(':') {
             let wildcard = format!("{}:*", resource);
             if permissions.contains(&wildcard) {
-                return PermissionCheck { allowed: true, requires_approval: None };
+                return PermissionCheck {
+                    allowed: true,
+                    requires_approval: None,
+                };
             }
         }
 
-        PermissionCheck { allowed: false, requires_approval: None }
+        PermissionCheck {
+            allowed: false,
+            requires_approval: None,
+        }
     }
 
     fn get_approval_requirement(&self, role: &str, permission: &str) -> Option<String> {
-        fn find_in_role(
-            config: &RbacConfig,
-            role: &str,
-            permission: &str,
-        ) -> Option<String> {
+        fn find_in_role(config: &RbacConfig, role: &str, permission: &str) -> Option<String> {
             if let Some(role_def) = config.roles.get(role) {
                 for perm in &role_def.permissions {
                     if perm.permission_string() == permission {

@@ -198,10 +198,9 @@ impl OAuthRegistry {
     }
 
     pub fn authorization_url(&self, provider_name: &str) -> Result<(String, String)> {
-        let provider = self
-            .providers
-            .get(provider_name)
-            .ok_or_else(|| TsaError::Configuration(format!("Unknown provider: {}", provider_name)))?;
+        let provider = self.providers.get(provider_name).ok_or_else(|| {
+            TsaError::Configuration(format!("Unknown provider: {}", provider_name))
+        })?;
 
         let client = provider.client();
         let csrf_token = CsrfToken::new_random();
@@ -252,10 +251,9 @@ impl OAuthRegistry {
             return Err(TsaError::InvalidToken);
         }
 
-        let provider = self
-            .providers
-            .get(provider_name)
-            .ok_or_else(|| TsaError::Configuration(format!("Unknown provider: {}", provider_name)))?;
+        let provider = self.providers.get(provider_name).ok_or_else(|| {
+            TsaError::Configuration(format!("Unknown provider: {}", provider_name))
+        })?;
 
         let tokens = provider
             .exchange_code(code, decoded_state.pkce_verifier.as_deref())

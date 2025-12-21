@@ -31,16 +31,46 @@ impl DynamoDbOrganizationInvitationRepository {
 
     fn to_item(invitation: &OrganizationInvitation) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
-        item.insert("id".to_string(), AttributeValue::S(invitation.id.to_string()));
-        item.insert("organization_id".to_string(), AttributeValue::S(invitation.organization_id.to_string()));
-        item.insert("email".to_string(), AttributeValue::S(invitation.email.clone()));
-        item.insert("role".to_string(), AttributeValue::S(invitation.role.to_string()));
-        item.insert("token_hash".to_string(), AttributeValue::S(invitation.token_hash.clone()));
-        item.insert("invited_by".to_string(), AttributeValue::S(invitation.invited_by.to_string()));
-        item.insert("status".to_string(), AttributeValue::S(invitation.status.to_string()));
-        item.insert("expires_at".to_string(), AttributeValue::S(invitation.expires_at.to_rfc3339()));
-        item.insert("created_at".to_string(), AttributeValue::S(invitation.created_at.to_rfc3339()));
-        item.insert("ttl".to_string(), AttributeValue::N(invitation.expires_at.timestamp().to_string()));
+        item.insert(
+            "id".to_string(),
+            AttributeValue::S(invitation.id.to_string()),
+        );
+        item.insert(
+            "organization_id".to_string(),
+            AttributeValue::S(invitation.organization_id.to_string()),
+        );
+        item.insert(
+            "email".to_string(),
+            AttributeValue::S(invitation.email.clone()),
+        );
+        item.insert(
+            "role".to_string(),
+            AttributeValue::S(invitation.role.to_string()),
+        );
+        item.insert(
+            "token_hash".to_string(),
+            AttributeValue::S(invitation.token_hash.clone()),
+        );
+        item.insert(
+            "invited_by".to_string(),
+            AttributeValue::S(invitation.invited_by.to_string()),
+        );
+        item.insert(
+            "status".to_string(),
+            AttributeValue::S(invitation.status.to_string()),
+        );
+        item.insert(
+            "expires_at".to_string(),
+            AttributeValue::S(invitation.expires_at.to_rfc3339()),
+        );
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(invitation.created_at.to_rfc3339()),
+        );
+        item.insert(
+            "ttl".to_string(),
+            AttributeValue::N(invitation.expires_at.timestamp().to_string()),
+        );
         item
     }
 

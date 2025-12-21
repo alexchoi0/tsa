@@ -29,16 +29,34 @@ impl DynamoDbAccountLockoutRepository {
     fn to_item(lockout: &AccountLockout) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(lockout.id.to_string()));
-        item.insert("user_id".to_string(), AttributeValue::S(lockout.user_id.to_string()));
-        item.insert("failed_attempts".to_string(), AttributeValue::N(lockout.failed_attempts.to_string()));
+        item.insert(
+            "user_id".to_string(),
+            AttributeValue::S(lockout.user_id.to_string()),
+        );
+        item.insert(
+            "failed_attempts".to_string(),
+            AttributeValue::N(lockout.failed_attempts.to_string()),
+        );
         if let Some(ref locked_until) = lockout.locked_until {
-            item.insert("locked_until".to_string(), AttributeValue::S(locked_until.to_rfc3339()));
+            item.insert(
+                "locked_until".to_string(),
+                AttributeValue::S(locked_until.to_rfc3339()),
+            );
         }
         if let Some(ref last_failed_at) = lockout.last_failed_at {
-            item.insert("last_failed_at".to_string(), AttributeValue::S(last_failed_at.to_rfc3339()));
+            item.insert(
+                "last_failed_at".to_string(),
+                AttributeValue::S(last_failed_at.to_rfc3339()),
+            );
         }
-        item.insert("created_at".to_string(), AttributeValue::S(lockout.created_at.to_rfc3339()));
-        item.insert("updated_at".to_string(), AttributeValue::S(lockout.updated_at.to_rfc3339()));
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(lockout.created_at.to_rfc3339()),
+        );
+        item.insert(
+            "updated_at".to_string(),
+            AttributeValue::S(lockout.updated_at.to_rfc3339()),
+        );
         item
     }
 

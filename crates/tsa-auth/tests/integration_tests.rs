@@ -5,11 +5,7 @@ use tsa_auth_core::{OrganizationRole, Result, TsaError, User};
 use uuid::Uuid;
 
 fn create_auth() -> Auth<InMemoryAdapter, NoopCallbacks> {
-    Auth::new(
-        InMemoryAdapter::new(),
-        AuthConfig::default(),
-        NoopCallbacks,
-    )
+    Auth::new(InMemoryAdapter::new(), AuthConfig::default(), NoopCallbacks)
 }
 
 fn create_auth_with_verification() -> Auth<InMemoryAdapter, NoopCallbacks> {
@@ -25,7 +21,11 @@ async fn test_signup_creates_user_and_session() {
     let auth = create_auth();
 
     let (user, session, token) = auth
-        .signup("test@example.com", "password123", Some("Test User".to_string()))
+        .signup(
+            "test@example.com",
+            "password123",
+            Some("Test User".to_string()),
+        )
         .await
         .unwrap();
 
@@ -44,7 +44,9 @@ async fn test_signup_duplicate_email_fails() {
         .await
         .unwrap();
 
-    let result = auth.signup("test@example.com", "different_password", None).await;
+    let result = auth
+        .signup("test@example.com", "different_password", None)
+        .await;
 
     assert!(matches!(result, Err(TsaError::UserAlreadyExists)));
 }
@@ -432,7 +434,13 @@ async fn test_create_api_key() {
         .unwrap();
 
     let (api_key, full_key) = auth
-        .create_api_key(user.id, "My API Key", vec!["read:users".to_string()], None, None)
+        .create_api_key(
+            user.id,
+            "My API Key",
+            vec!["read:users".to_string()],
+            None,
+            None,
+        )
         .await
         .unwrap();
 
@@ -688,10 +696,7 @@ async fn test_set_user_phone() {
         .await
         .unwrap();
 
-    let updated = auth
-        .set_user_phone(user.id, "+1234567890")
-        .await
-        .unwrap();
+    let updated = auth.set_user_phone(user.id, "+1234567890").await.unwrap();
 
     assert_eq!(updated.phone, Some("+1234567890".to_string()));
     assert!(!updated.phone_verified);

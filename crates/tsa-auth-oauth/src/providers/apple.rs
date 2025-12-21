@@ -63,14 +63,14 @@ impl OAuthProvider for AppleProvider {
     async fn get_user_info(&self, access_token: &str) -> Result<OAuthUserInfo> {
         let parts: Vec<&str> = access_token.split('.').collect();
         if parts.len() != 3 {
-            return Err(TsaError::Internal("Invalid Apple ID token format".to_string()));
+            return Err(TsaError::Internal(
+                "Invalid Apple ID token format".to_string(),
+            ));
         }
 
-        let payload = base64::Engine::decode(
-            &base64::engine::general_purpose::URL_SAFE_NO_PAD,
-            parts[1],
-        )
-        .map_err(|e| TsaError::Internal(format!("Failed to decode token: {}", e)))?;
+        let payload =
+            base64::Engine::decode(&base64::engine::general_purpose::URL_SAFE_NO_PAD, parts[1])
+                .map_err(|e| TsaError::Internal(format!("Failed to decode token: {}", e)))?;
 
         let token_data: AppleIdToken = serde_json::from_slice(&payload)
             .map_err(|e| TsaError::Internal(format!("Failed to parse token: {}", e)))?;

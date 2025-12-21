@@ -1,7 +1,9 @@
 use async_trait::async_trait;
 use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
 use std::sync::Arc;
-use tsa_auth_core::{OrganizationMember, OrganizationMemberRepository, OrganizationRole, Result, TsaError};
+use tsa_auth_core::{
+    OrganizationMember, OrganizationMemberRepository, OrganizationRole, Result, TsaError,
+};
 use uuid::Uuid;
 
 use crate::entity::organization_member::{ActiveModel, Column, Entity};
@@ -42,16 +44,13 @@ impl OrganizationMemberRepository for SeaOrmOrganizationMemberRepository {
             updated_at: Set(member.updated_at),
         };
 
-        let result = active_model
-            .insert(self.db.as_ref())
-            .await
-            .map_err(|e| {
-                if e.to_string().contains("duplicate") || e.to_string().contains("UNIQUE") {
-                    TsaError::AlreadyOrganizationMember
-                } else {
-                    TsaError::Database(e.to_string())
-                }
-            })?;
+        let result = active_model.insert(self.db.as_ref()).await.map_err(|e| {
+            if e.to_string().contains("duplicate") || e.to_string().contains("UNIQUE") {
+                TsaError::AlreadyOrganizationMember
+            } else {
+                TsaError::Database(e.to_string())
+            }
+        })?;
 
         Ok(result.into())
     }

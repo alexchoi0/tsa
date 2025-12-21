@@ -61,9 +61,9 @@ pub async fn create_api_key(
     auth: AuthUser,
     Json(req): Json<CreateApiKeyRequest>,
 ) -> Result<Json<ApiKeyCreatedResponse>, ApiError> {
-    let expires_at = req.expires_in_days.map(|days| {
-        chrono::Utc::now() + chrono::Duration::days(days)
-    });
+    let expires_at = req
+        .expires_in_days
+        .map(|days| chrono::Utc::now() + chrono::Duration::days(days));
 
     let (key, secret) = state
         .auth

@@ -39,8 +39,8 @@ impl From<crate::entity::api_key::Model> for ApiKey {
 #[async_trait]
 impl ApiKeyRepository for SeaOrmApiKeyRepository {
     async fn create(&self, api_key: &ApiKey) -> Result<ApiKey> {
-        let scopes_json = serde_json::to_value(&api_key.scopes)
-            .map_err(|e| TsaError::Internal(e.to_string()))?;
+        let scopes_json =
+            serde_json::to_value(&api_key.scopes).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let active_model = ActiveModel {
             id: Set(api_key.id),
@@ -113,8 +113,8 @@ impl ApiKeyRepository for SeaOrmApiKeyRepository {
     }
 
     async fn update(&self, api_key: &ApiKey) -> Result<ApiKey> {
-        let scopes_json = serde_json::to_value(&api_key.scopes)
-            .map_err(|e| TsaError::Internal(e.to_string()))?;
+        let scopes_json =
+            serde_json::to_value(&api_key.scopes).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let active_model = ActiveModel {
             id: Set(api_key.id),

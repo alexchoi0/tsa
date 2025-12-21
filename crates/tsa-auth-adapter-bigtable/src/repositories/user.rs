@@ -34,15 +34,11 @@ impl UserRepository for BigtableUserRepository {
     }
 
     async fn find_by_email(&self, email: &str) -> Result<Option<User>> {
-        self.client
-            .find_by_field(ENTITY_TYPE, "email", email)
-            .await
+        self.client.find_by_field(ENTITY_TYPE, "email", email).await
     }
 
     async fn find_by_phone(&self, phone: &str) -> Result<Option<User>> {
-        self.client
-            .find_by_field(ENTITY_TYPE, "phone", phone)
-            .await
+        self.client.find_by_field(ENTITY_TYPE, "phone", phone).await
     }
 
     async fn update(&self, user: &User) -> Result<User> {

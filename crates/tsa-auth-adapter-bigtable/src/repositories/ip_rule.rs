@@ -48,9 +48,7 @@ impl IpRuleRepository for BigtableIpRuleRepository {
         let now = Utc::now();
         Ok(all_rules
             .into_iter()
-            .filter(|rule| {
-                rule.expires_at.map_or(true, |exp| exp > now)
-            })
+            .filter(|rule| rule.expires_at.is_none_or(|exp| exp > now))
             .collect())
     }
 

@@ -27,7 +27,8 @@ impl PasswordHistoryRepository for BigtablePasswordHistoryRepository {
     }
 
     async fn find_by_user(&self, user_id: Uuid, limit: u32) -> Result<Vec<PasswordHistory>> {
-        let mut histories: Vec<PasswordHistory> = self.client
+        let mut histories: Vec<PasswordHistory> = self
+            .client
             .find_all_by_field(ENTITY_TYPE, "user_id", &user_id.to_string())
             .await?;
         histories.sort_by(|a, b| b.created_at.cmp(&a.created_at));
@@ -35,7 +36,8 @@ impl PasswordHistoryRepository for BigtablePasswordHistoryRepository {
     }
 
     async fn delete_old_entries(&self, user_id: Uuid, keep_count: u32) -> Result<u64> {
-        let mut histories = self.client
+        let mut histories = self
+            .client
             .find_all_by_field::<PasswordHistory>(ENTITY_TYPE, "user_id", &user_id.to_string())
             .await?;
         histories.sort_by(|a, b| b.created_at.cmp(&a.created_at));
@@ -54,7 +56,8 @@ impl PasswordHistoryRepository for BigtablePasswordHistoryRepository {
     }
 
     async fn delete_by_user(&self, user_id: Uuid) -> Result<()> {
-        let histories = self.client
+        let histories = self
+            .client
             .find_all_by_field::<PasswordHistory>(ENTITY_TYPE, "user_id", &user_id.to_string())
             .await?;
         for history in histories {

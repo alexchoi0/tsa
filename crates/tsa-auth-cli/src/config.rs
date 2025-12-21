@@ -65,8 +65,14 @@ impl CliConfig {
         self.current_context().and_then(|c| c.token.as_deref())
     }
 
-    pub fn set_context(&mut self, name: &str, server_url: String, token: Option<String>) -> Result<()> {
-        self.contexts.insert(name.to_string(), Context { server_url, token });
+    pub fn set_context(
+        &mut self,
+        name: &str,
+        server_url: String,
+        token: Option<String>,
+    ) -> Result<()> {
+        self.contexts
+            .insert(name.to_string(), Context { server_url, token });
         if self.current_context.is_none() {
             self.current_context = Some(name.to_string());
         }
@@ -93,7 +99,9 @@ impl CliConfig {
     }
 
     pub fn rename_context(&mut self, old_name: &str, new_name: &str) -> Result<()> {
-        let ctx = self.contexts.remove(old_name)
+        let ctx = self
+            .contexts
+            .remove(old_name)
             .ok_or_else(|| anyhow!("Context '{}' not found", old_name))?;
         self.contexts.insert(new_name.to_string(), ctx);
         if self.current_context.as_deref() == Some(old_name) {
@@ -103,7 +111,9 @@ impl CliConfig {
     }
 
     pub fn set_token(&mut self, token: Option<String>) -> Result<()> {
-        let ctx_name = self.current_context.clone()
+        let ctx_name = self
+            .current_context
+            .clone()
             .ok_or_else(|| anyhow!("No context selected. Use 'tsa config set-context' first."))?;
         if let Some(ctx) = self.contexts.get_mut(&ctx_name) {
             ctx.token = token;

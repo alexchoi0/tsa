@@ -28,20 +28,44 @@ impl DynamoDbAccountRepository {
     fn to_item(account: &Account) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(account.id.to_string()));
-        item.insert("user_id".to_string(), AttributeValue::S(account.user_id.to_string()));
-        item.insert("provider".to_string(), AttributeValue::S(account.provider.clone()));
-        item.insert("provider_account_id".to_string(), AttributeValue::S(account.provider_account_id.clone()));
-        item.insert("provider_key".to_string(), AttributeValue::S(format!("{}#{}", account.provider, account.provider_account_id)));
+        item.insert(
+            "user_id".to_string(),
+            AttributeValue::S(account.user_id.to_string()),
+        );
+        item.insert(
+            "provider".to_string(),
+            AttributeValue::S(account.provider.clone()),
+        );
+        item.insert(
+            "provider_account_id".to_string(),
+            AttributeValue::S(account.provider_account_id.clone()),
+        );
+        item.insert(
+            "provider_key".to_string(),
+            AttributeValue::S(format!(
+                "{}#{}",
+                account.provider, account.provider_account_id
+            )),
+        );
         if let Some(ref token) = account.access_token {
             item.insert("access_token".to_string(), AttributeValue::S(token.clone()));
         }
         if let Some(ref token) = account.refresh_token {
-            item.insert("refresh_token".to_string(), AttributeValue::S(token.clone()));
+            item.insert(
+                "refresh_token".to_string(),
+                AttributeValue::S(token.clone()),
+            );
         }
         if let Some(ref expires) = account.expires_at {
-            item.insert("expires_at".to_string(), AttributeValue::S(expires.to_rfc3339()));
+            item.insert(
+                "expires_at".to_string(),
+                AttributeValue::S(expires.to_rfc3339()),
+            );
         }
-        item.insert("created_at".to_string(), AttributeValue::S(account.created_at.to_rfc3339()));
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(account.created_at.to_rfc3339()),
+        );
         item
     }
 

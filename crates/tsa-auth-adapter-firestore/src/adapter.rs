@@ -38,7 +38,9 @@ impl FirestoreAdapter {
             two_factor: FirestoreTwoFactorRepository::new(client.clone()),
             organizations: FirestoreOrganizationRepository::new(client.clone()),
             organization_members: FirestoreOrganizationMemberRepository::new(client.clone()),
-            organization_invitations: FirestoreOrganizationInvitationRepository::new(client.clone()),
+            organization_invitations: FirestoreOrganizationInvitationRepository::new(
+                client.clone(),
+            ),
             api_keys: FirestoreApiKeyRepository::new(client.clone()),
             passkeys: FirestorePasskeyRepository::new(client.clone()),
             passkey_challenges: FirestorePasskeyChallengeRepository::new(client.clone()),

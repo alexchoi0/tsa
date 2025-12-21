@@ -105,7 +105,10 @@ impl std::str::FromStr for OrganizationRole {
             "owner" => Ok(OrganizationRole::Owner),
             "admin" => Ok(OrganizationRole::Admin),
             "member" => Ok(OrganizationRole::Member),
-            _ => Err(crate::TsaError::InvalidInput(format!("Invalid role: {}", s))),
+            _ => Err(crate::TsaError::InvalidInput(format!(
+                "Invalid role: {}",
+                s
+            ))),
         }
     }
 }
@@ -148,7 +151,10 @@ impl std::str::FromStr for InvitationStatus {
             "accepted" => Ok(InvitationStatus::Accepted),
             "expired" => Ok(InvitationStatus::Expired),
             "revoked" => Ok(InvitationStatus::Revoked),
-            _ => Err(crate::TsaError::InvalidInput(format!("Invalid status: {}", s))),
+            _ => Err(crate::TsaError::InvalidInput(format!(
+                "Invalid status: {}",
+                s
+            ))),
         }
     }
 }
@@ -241,7 +247,10 @@ impl std::str::FromStr for ApprovalStatus {
             "denied" => Ok(ApprovalStatus::Denied),
             "expired" => Ok(ApprovalStatus::Expired),
             "cancelled" => Ok(ApprovalStatus::Cancelled),
-            _ => Err(crate::TsaError::InvalidInput(format!("Invalid approval status: {}", s))),
+            _ => Err(crate::TsaError::InvalidInput(format!(
+                "Invalid approval status: {}",
+                s
+            ))),
         }
     }
 }
@@ -461,11 +470,17 @@ impl PasswordPolicy {
         let mut errors = Vec::new();
 
         if password.len() < self.min_length as usize {
-            errors.push(format!("Password must be at least {} characters", self.min_length));
+            errors.push(format!(
+                "Password must be at least {} characters",
+                self.min_length
+            ));
         }
 
         if password.len() > self.max_length as usize {
-            errors.push(format!("Password must be at most {} characters", self.max_length));
+            errors.push(format!(
+                "Password must be at most {} characters",
+                self.max_length
+            ));
         }
 
         if self.require_uppercase && !password.chars().any(|c| c.is_uppercase()) {
@@ -480,7 +495,11 @@ impl PasswordPolicy {
             errors.push("Password must contain at least one number".to_string());
         }
 
-        if self.require_special && !password.chars().any(|c| self.special_characters.contains(c)) {
+        if self.require_special
+            && !password
+                .chars()
+                .any(|c| self.special_characters.contains(c))
+        {
             errors.push("Password must contain at least one special character".to_string());
         }
 
@@ -572,7 +591,11 @@ impl IpRule {
                 if prefix_len > 32 {
                     return false;
                 }
-                let mask = if prefix_len == 0 { 0 } else { !0u32 << (32 - prefix_len) };
+                let mask = if prefix_len == 0 {
+                    0
+                } else {
+                    !0u32 << (32 - prefix_len)
+                };
                 (u32::from(net) & mask) == (u32::from(tgt) & mask)
             }
             (IpAddr::V6(net), IpAddr::V6(tgt)) => {
@@ -643,9 +666,18 @@ mod tests {
 
     #[test]
     fn test_organization_role_from_str() {
-        assert_eq!("owner".parse::<OrganizationRole>().unwrap(), OrganizationRole::Owner);
-        assert_eq!("ADMIN".parse::<OrganizationRole>().unwrap(), OrganizationRole::Admin);
-        assert_eq!("Member".parse::<OrganizationRole>().unwrap(), OrganizationRole::Member);
+        assert_eq!(
+            "owner".parse::<OrganizationRole>().unwrap(),
+            OrganizationRole::Owner
+        );
+        assert_eq!(
+            "ADMIN".parse::<OrganizationRole>().unwrap(),
+            OrganizationRole::Admin
+        );
+        assert_eq!(
+            "Member".parse::<OrganizationRole>().unwrap(),
+            OrganizationRole::Member
+        );
         assert!("invalid".parse::<OrganizationRole>().is_err());
     }
 
@@ -659,8 +691,14 @@ mod tests {
 
     #[test]
     fn test_invitation_status_from_str() {
-        assert_eq!("pending".parse::<InvitationStatus>().unwrap(), InvitationStatus::Pending);
-        assert_eq!("ACCEPTED".parse::<InvitationStatus>().unwrap(), InvitationStatus::Accepted);
+        assert_eq!(
+            "pending".parse::<InvitationStatus>().unwrap(),
+            InvitationStatus::Pending
+        );
+        assert_eq!(
+            "ACCEPTED".parse::<InvitationStatus>().unwrap(),
+            InvitationStatus::Accepted
+        );
         assert!("invalid".parse::<InvitationStatus>().is_err());
     }
 
@@ -673,8 +711,14 @@ mod tests {
 
     #[test]
     fn test_approval_status_from_str() {
-        assert_eq!("pending".parse::<ApprovalStatus>().unwrap(), ApprovalStatus::Pending);
-        assert_eq!("APPROVED".parse::<ApprovalStatus>().unwrap(), ApprovalStatus::Approved);
+        assert_eq!(
+            "pending".parse::<ApprovalStatus>().unwrap(),
+            ApprovalStatus::Pending
+        );
+        assert_eq!(
+            "APPROVED".parse::<ApprovalStatus>().unwrap(),
+            ApprovalStatus::Approved
+        );
         assert!("unknown".parse::<ApprovalStatus>().is_err());
     }
 

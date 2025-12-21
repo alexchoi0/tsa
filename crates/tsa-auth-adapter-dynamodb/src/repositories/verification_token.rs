@@ -29,12 +29,30 @@ impl DynamoDbVerificationTokenRepository {
     fn to_item(token: &VerificationToken) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(token.id.to_string()));
-        item.insert("user_id".to_string(), AttributeValue::S(token.user_id.to_string()));
-        item.insert("token_hash".to_string(), AttributeValue::S(token.token_hash.clone()));
-        item.insert("token_type".to_string(), AttributeValue::S(format!("{:?}", token.token_type)));
-        item.insert("expires_at".to_string(), AttributeValue::S(token.expires_at.to_rfc3339()));
-        item.insert("created_at".to_string(), AttributeValue::S(token.created_at.to_rfc3339()));
-        item.insert("ttl".to_string(), AttributeValue::N(token.expires_at.timestamp().to_string()));
+        item.insert(
+            "user_id".to_string(),
+            AttributeValue::S(token.user_id.to_string()),
+        );
+        item.insert(
+            "token_hash".to_string(),
+            AttributeValue::S(token.token_hash.clone()),
+        );
+        item.insert(
+            "token_type".to_string(),
+            AttributeValue::S(format!("{:?}", token.token_type)),
+        );
+        item.insert(
+            "expires_at".to_string(),
+            AttributeValue::S(token.expires_at.to_rfc3339()),
+        );
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(token.created_at.to_rfc3339()),
+        );
+        item.insert(
+            "ttl".to_string(),
+            AttributeValue::N(token.expires_at.timestamp().to_string()),
+        );
         item
     }
 
@@ -46,7 +64,12 @@ impl DynamoDbVerificationTokenRepository {
             "MagicLink" => TokenType::MagicLink,
             "EmailOtp" => TokenType::EmailOtp,
             "PhoneOtp" => TokenType::PhoneOtp,
-            _ => return Err(TsaError::Database(format!("Invalid token type: {}", token_type_str))),
+            _ => {
+                return Err(TsaError::Database(format!(
+                    "Invalid token type: {}",
+                    token_type_str
+                )))
+            }
         };
 
         Ok(VerificationToken {

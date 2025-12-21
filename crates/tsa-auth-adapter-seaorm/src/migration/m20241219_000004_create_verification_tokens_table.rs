@@ -15,7 +15,11 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(uuid(VerificationTokens::Id).primary_key())
                     .col(uuid(VerificationTokens::UserId).not_null())
-                    .col(string(VerificationTokens::TokenHash).unique_key().not_null())
+                    .col(
+                        string(VerificationTokens::TokenHash)
+                            .unique_key()
+                            .not_null(),
+                    )
                     .col(string(VerificationTokens::TokenType).not_null())
                     .col(timestamp_with_time_zone(VerificationTokens::ExpiresAt).not_null())
                     .col(timestamp_with_time_zone(VerificationTokens::CreatedAt).not_null())

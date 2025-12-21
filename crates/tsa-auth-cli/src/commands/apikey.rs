@@ -19,7 +19,7 @@ struct ApiKeyResponse {
     created_at: String,
 }
 
-fn display_scopes(scopes: &Vec<String>) -> String {
+fn display_scopes(scopes: &[String]) -> String {
     if scopes.is_empty() {
         "-".to_string()
     } else {

@@ -12,7 +12,12 @@ pub struct OAuthState {
 }
 
 impl OAuthState {
-    pub fn new(provider: &str, csrf_token: String, pkce_verifier: Option<String>, secret: &str) -> Self {
+    pub fn new(
+        provider: &str,
+        csrf_token: String,
+        pkce_verifier: Option<String>,
+        secret: &str,
+    ) -> Self {
         let mut state = Self {
             csrf_token,
             pkce_verifier,
@@ -24,8 +29,7 @@ impl OAuthState {
     }
 
     pub fn encode(&self) -> Result<String> {
-        let json = serde_json::to_string(self)
-            .map_err(|e| TsaError::Internal(e.to_string()))?;
+        let json = serde_json::to_string(self).map_err(|e| TsaError::Internal(e.to_string()))?;
         Ok(URL_SAFE_NO_PAD.encode(json.as_bytes()))
     }
 
@@ -34,8 +38,7 @@ impl OAuthState {
             .decode(encoded)
             .map_err(|_| TsaError::InvalidToken)?;
 
-        let state: Self = serde_json::from_slice(&bytes)
-            .map_err(|_| TsaError::InvalidToken)?;
+        let state: Self = serde_json::from_slice(&bytes).map_err(|_| TsaError::InvalidToken)?;
 
         let expected_sig = state.compute_signature(secret);
         if state.signature != expected_sig {

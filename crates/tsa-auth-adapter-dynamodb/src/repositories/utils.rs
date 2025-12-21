@@ -12,7 +12,9 @@ pub fn get_string(item: &HashMap<String, AttributeValue>, key: &str) -> Result<S
 }
 
 pub fn get_string_opt(item: &HashMap<String, AttributeValue>, key: &str) -> Option<String> {
-    item.get(key).and_then(|v| v.as_s().ok()).map(|s| s.to_string())
+    item.get(key)
+        .and_then(|v| v.as_s().ok())
+        .map(|s| s.to_string())
 }
 
 pub fn get_bool(item: &HashMap<String, AttributeValue>, key: &str) -> Result<bool, TsaError> {
@@ -27,7 +29,10 @@ pub fn get_uuid(item: &HashMap<String, AttributeValue>, key: &str) -> Result<Uui
     Uuid::parse_str(&s).map_err(|e| TsaError::Database(format!("Invalid UUID: {}", e)))
 }
 
-pub fn get_uuid_opt(item: &HashMap<String, AttributeValue>, key: &str) -> Result<Option<Uuid>, TsaError> {
+pub fn get_uuid_opt(
+    item: &HashMap<String, AttributeValue>,
+    key: &str,
+) -> Result<Option<Uuid>, TsaError> {
     match get_string_opt(item, key) {
         Some(s) => Uuid::parse_str(&s)
             .map(Some)
@@ -85,11 +90,4 @@ pub fn get_bytes(item: &HashMap<String, AttributeValue>, key: &str) -> Result<Ve
 
 pub fn string_vec_to_attr(vec: &[String]) -> AttributeValue {
     AttributeValue::L(vec.iter().map(|s| AttributeValue::S(s.clone())).collect())
-}
-
-pub fn opt_string_vec_to_attr(vec: &Option<Vec<String>>) -> AttributeValue {
-    match vec {
-        Some(v) => string_vec_to_attr(v),
-        None => AttributeValue::Null(true),
-    }
 }

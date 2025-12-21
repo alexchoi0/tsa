@@ -103,7 +103,12 @@ struct UpdateOrgRequest {
     logo: Option<String>,
 }
 
-pub async fn update(client: &TsaClient, id: &str, name: Option<&str>, logo: Option<&str>) -> Result<()> {
+pub async fn update(
+    client: &TsaClient,
+    id: &str,
+    name: Option<&str>,
+    logo: Option<&str>,
+) -> Result<()> {
     let req = UpdateOrgRequest {
         name: name.map(|n| n.to_string()),
         logo: logo.map(|l| l.to_string()),
@@ -132,7 +137,9 @@ pub async fn delete(client: &TsaClient, id: &str) -> Result<()> {
 }
 
 pub async fn members(client: &TsaClient, id: &str) -> Result<()> {
-    let members: Vec<MemberResponse> = client.get(&format!("/organizations/{}/members", id)).await?;
+    let members: Vec<MemberResponse> = client
+        .get(&format!("/organizations/{}/members", id))
+        .await?;
 
     if members.is_empty() {
         println!("{}", "No members found".yellow());
@@ -178,7 +185,9 @@ pub async fn add_member(client: &TsaClient, org_id: &str, user_id: &str, role: &
         role: role.to_string(),
     };
 
-    let _: MemberResponse = client.post(&format!("/organizations/{}/members", org_id), &req).await?;
+    let _: MemberResponse = client
+        .post(&format!("/organizations/{}/members", org_id), &req)
+        .await?;
 
     println!("{}", "Member added successfully!".green().bold());
 
@@ -190,13 +199,21 @@ struct UpdateMemberRequest {
     role: String,
 }
 
-pub async fn update_member(client: &TsaClient, org_id: &str, user_id: &str, role: &str) -> Result<()> {
+pub async fn update_member(
+    client: &TsaClient,
+    org_id: &str,
+    user_id: &str,
+    role: &str,
+) -> Result<()> {
     let req = UpdateMemberRequest {
         role: role.to_string(),
     };
 
     let member: MemberResponse = client
-        .put(&format!("/organizations/{}/members/{}", org_id, user_id), &req)
+        .put(
+            &format!("/organizations/{}/members/{}", org_id, user_id),
+            &req,
+        )
         .await?;
 
     println!("{}", "Member role updated successfully!".green().bold());

@@ -1,6 +1,6 @@
 use base64::{engine::general_purpose::STANDARD, Engine};
-use tsa_auth_core::{Result, TsaError};
 use totp_rs::{Algorithm, Secret, TOTP};
+use tsa_auth_core::{Result, TsaError};
 
 pub struct TotpManager {
     issuer: String,

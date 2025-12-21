@@ -4,6 +4,8 @@ use tsa_auth_core::{ApprovalRequest, Result, TsaError};
 
 use crate::{ApprovalChannelDef, ApprovalChannelType};
 
+pub type EmailSenderFn = Box<dyn Fn(&str, &str, &str) -> Result<()> + Send + Sync>;
+
 #[async_trait]
 pub trait ApprovalChannel: Send + Sync {
     fn channel_type(&self) -> ApprovalChannelType;
@@ -17,7 +19,7 @@ pub trait ApprovalChannel: Send + Sync {
 }
 
 pub struct MagicLinkChannel {
-    pub send_email: Box<dyn Fn(&str, &str, &str) -> Result<()> + Send + Sync>,
+    pub send_email: EmailSenderFn,
 }
 
 #[async_trait]
@@ -223,7 +225,11 @@ impl WebhookChannel {
             .clone()
             .ok_or_else(|| TsaError::Configuration("Webhook channel requires url".into()))?;
 
-        Ok(Self::new(url, config.method.clone(), config.headers.clone()))
+        Ok(Self::new(
+            url,
+            config.method.clone(),
+            config.headers.clone(),
+        ))
     }
 }
 

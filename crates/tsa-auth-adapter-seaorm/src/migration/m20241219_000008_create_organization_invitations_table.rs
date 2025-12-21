@@ -18,7 +18,11 @@ impl MigrationTrait for Migration {
                     .col(uuid(OrganizationInvitations::OrganizationId).not_null())
                     .col(string(OrganizationInvitations::Email).not_null())
                     .col(string(OrganizationInvitations::Role).not_null())
-                    .col(string(OrganizationInvitations::TokenHash).unique_key().not_null())
+                    .col(
+                        string(OrganizationInvitations::TokenHash)
+                            .unique_key()
+                            .not_null(),
+                    )
                     .col(uuid(OrganizationInvitations::InvitedBy).not_null())
                     .col(string(OrganizationInvitations::Status).not_null())
                     .col(timestamp_with_time_zone(OrganizationInvitations::ExpiresAt).not_null())
@@ -26,14 +30,20 @@ impl MigrationTrait for Migration {
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_organization_invitations_org")
-                            .from(OrganizationInvitations::Table, OrganizationInvitations::OrganizationId)
+                            .from(
+                                OrganizationInvitations::Table,
+                                OrganizationInvitations::OrganizationId,
+                            )
                             .to(Organizations::Table, Organizations::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_organization_invitations_inviter")
-                            .from(OrganizationInvitations::Table, OrganizationInvitations::InvitedBy)
+                            .from(
+                                OrganizationInvitations::Table,
+                                OrganizationInvitations::InvitedBy,
+                            )
                             .to(Users::Table, Users::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
@@ -74,7 +84,11 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(OrganizationInvitations::Table).to_owned())
+            .drop_table(
+                Table::drop()
+                    .table(OrganizationInvitations::Table)
+                    .to_owned(),
+            )
             .await
     }
 }

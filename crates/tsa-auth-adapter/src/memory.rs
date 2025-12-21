@@ -3,8 +3,8 @@ use chrono::Utc;
 use std::collections::HashMap;
 use std::sync::RwLock;
 use tsa_auth_core::{
-    Account, AccountLockout, AccountLockoutRepository, AccountRepository, ApiKey,
-    ApiKeyRepository, AuditAction, AuditLog, AuditLogRepository, ImpersonationSession,
+    Account, AccountLockout, AccountLockoutRepository, AccountRepository, ApiKey, ApiKeyRepository,
+    AuditAction, AuditLog, AuditLogRepository, ImpersonationSession,
     ImpersonationSessionRepository, InvitationStatus, IpRule, IpRuleRepository, IpRuleType,
     Organization, OrganizationInvitation, OrganizationInvitationRepository, OrganizationMember,
     OrganizationMemberRepository, OrganizationRepository, Passkey, PasskeyChallenge,
@@ -628,10 +628,7 @@ impl ApiKeyRepository for InMemoryApiKeyRepository {
 
     async fn find_by_key_hash(&self, key_hash: &str) -> Result<Option<ApiKey>> {
         let api_keys = self.api_keys.read().unwrap();
-        Ok(api_keys
-            .values()
-            .find(|k| k.key_hash == key_hash)
-            .cloned())
+        Ok(api_keys.values().find(|k| k.key_hash == key_hash).cloned())
     }
 
     async fn find_by_prefix(&self, prefix: &str) -> Result<Option<ApiKey>> {
@@ -864,7 +861,11 @@ impl AuditLogRepository for InMemoryAuditLogRepository {
         offset: u32,
     ) -> Result<Vec<AuditLog>> {
         let logs = self.logs.read().unwrap();
-        let mut result: Vec<_> = logs.values().filter(|l| l.action == action).cloned().collect();
+        let mut result: Vec<_> = logs
+            .values()
+            .filter(|l| l.action == action)
+            .cloned()
+            .collect();
         result.sort_by(|a, b| b.created_at.cmp(&a.created_at));
         Ok(result
             .into_iter()
@@ -1135,7 +1136,7 @@ impl IpRuleRepository for InMemoryIpRuleRepository {
         let now = Utc::now();
         Ok(rules
             .values()
-            .filter(|r| r.expires_at.map_or(true, |exp| exp > now))
+            .filter(|r| r.expires_at.is_none_or(|exp| exp > now))
             .cloned()
             .collect())
     }
@@ -1156,7 +1157,7 @@ impl IpRuleRepository for InMemoryIpRuleRepository {
         let mut rules = self.rules.write().unwrap();
         let now = Utc::now();
         let before = rules.len();
-        rules.retain(|_, r| r.expires_at.map_or(true, |exp| exp > now));
+        rules.retain(|_, r| r.expires_at.is_none_or(|exp| exp > now));
         Ok((before - rules.len()) as u64)
     }
 }
@@ -1289,7 +1290,12 @@ mod tests {
     #[tokio::test]
     async fn test_adapter_default() {
         let adapter = InMemoryAdapter::default();
-        assert!(adapter.users().find_by_email("nonexistent@test.com").await.unwrap().is_none());
+        assert!(adapter
+            .users()
+            .find_by_email("nonexistent@test.com")
+            .await
+            .unwrap()
+            .is_none());
     }
 
     #[tokio::test]
@@ -1666,10 +1672,15 @@ mod tests {
         let found = repo.find_by_token_hash("hash123").await.unwrap();
         assert!(found.is_some());
 
-        let pending = repo.find_pending_by_org_and_email(org_id, "invite@test.com").await.unwrap();
+        let pending = repo
+            .find_pending_by_org_and_email(org_id, "invite@test.com")
+            .await
+            .unwrap();
         assert!(pending.is_some());
 
-        repo.update_status(invitation.id, InvitationStatus::Accepted).await.unwrap();
+        repo.update_status(invitation.id, InvitationStatus::Accepted)
+            .await
+            .unwrap();
         let updated = repo.find_by_id(invitation.id).await.unwrap().unwrap();
         assert_eq!(updated.status, InvitationStatus::Accepted);
     }
@@ -1794,7 +1805,10 @@ mod tests {
 
         let found = repo.find_by_challenge(&[1, 2, 3, 4, 5]).await.unwrap();
         assert!(found.is_some());
-        assert_eq!(found.unwrap().challenge_type, PasskeyChallengeType::Registration);
+        assert_eq!(
+            found.unwrap().challenge_type,
+            PasskeyChallengeType::Registration
+        );
     }
 
     #[tokio::test]

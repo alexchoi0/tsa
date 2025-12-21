@@ -1,6 +1,8 @@
 use async_trait::async_trait;
 use chrono::Utc;
-use tsa_auth_core::{InvitationStatus, OrganizationInvitation, OrganizationInvitationRepository, Result};
+use tsa_auth_core::{
+    InvitationStatus, OrganizationInvitation, OrganizationInvitationRepository, Result,
+};
 use uuid::Uuid;
 
 use crate::client::BigtableClient;

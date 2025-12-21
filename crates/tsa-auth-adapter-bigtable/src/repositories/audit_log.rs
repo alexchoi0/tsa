@@ -31,7 +31,8 @@ impl AuditLogRepository for BigtableAuditLogRepository {
     }
 
     async fn find_by_user(&self, user_id: Uuid, limit: u32, offset: u32) -> Result<Vec<AuditLog>> {
-        let mut logs: Vec<AuditLog> = self.client
+        let mut logs: Vec<AuditLog> = self
+            .client
             .find_all_by_field(ENTITY_TYPE, "user_id", &user_id.to_string())
             .await?;
         logs.sort_by(|a, b| b.created_at.cmp(&a.created_at));
@@ -62,7 +63,8 @@ impl AuditLogRepository for BigtableAuditLogRepository {
     }
 
     async fn find_by_ip(&self, ip_address: &str, limit: u32, offset: u32) -> Result<Vec<AuditLog>> {
-        let mut logs: Vec<AuditLog> = self.client
+        let mut logs: Vec<AuditLog> = self
+            .client
             .find_all_by_field(ENTITY_TYPE, "ip_address", ip_address)
             .await?;
         logs.sort_by(|a, b| b.created_at.cmp(&a.created_at));
@@ -85,10 +87,8 @@ impl AuditLogRepository for BigtableAuditLogRepository {
 
     async fn find_failed(&self, limit: u32, offset: u32) -> Result<Vec<AuditLog>> {
         let all_logs: Vec<AuditLog> = self.client.list_entities(ENTITY_TYPE).await?;
-        let mut filtered_logs: Vec<AuditLog> = all_logs
-            .into_iter()
-            .filter(|log| !log.success)
-            .collect();
+        let mut filtered_logs: Vec<AuditLog> =
+            all_logs.into_iter().filter(|log| !log.success).collect();
         filtered_logs.sort_by(|a, b| b.created_at.cmp(&a.created_at));
         Ok(filtered_logs
             .into_iter()
@@ -98,7 +98,8 @@ impl AuditLogRepository for BigtableAuditLogRepository {
     }
 
     async fn count_by_user(&self, user_id: Uuid) -> Result<u64> {
-        let logs = self.client
+        let logs = self
+            .client
             .find_all_by_field::<AuditLog>(ENTITY_TYPE, "user_id", &user_id.to_string())
             .await?;
         Ok(logs.len() as u64)
@@ -109,7 +110,8 @@ impl AuditLogRepository for BigtableAuditLogRepository {
         user_id: Uuid,
         since: chrono::DateTime<chrono::Utc>,
     ) -> Result<u32> {
-        let logs = self.client
+        let logs = self
+            .client
             .find_all_by_field::<AuditLog>(ENTITY_TYPE, "user_id", &user_id.to_string())
             .await?;
         let count = logs

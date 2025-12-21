@@ -29,19 +29,31 @@ impl DynamoDbUserRepository {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(user.id.to_string()));
         item.insert("email".to_string(), AttributeValue::S(user.email.clone()));
-        item.insert("email_verified".to_string(), AttributeValue::Bool(user.email_verified));
+        item.insert(
+            "email_verified".to_string(),
+            AttributeValue::Bool(user.email_verified),
+        );
         if let Some(ref phone) = user.phone {
             item.insert("phone".to_string(), AttributeValue::S(phone.clone()));
         }
-        item.insert("phone_verified".to_string(), AttributeValue::Bool(user.phone_verified));
+        item.insert(
+            "phone_verified".to_string(),
+            AttributeValue::Bool(user.phone_verified),
+        );
         if let Some(ref name) = user.name {
             item.insert("name".to_string(), AttributeValue::S(name.clone()));
         }
         if let Some(ref image) = user.image {
             item.insert("image".to_string(), AttributeValue::S(image.clone()));
         }
-        item.insert("created_at".to_string(), AttributeValue::S(user.created_at.to_rfc3339()));
-        item.insert("updated_at".to_string(), AttributeValue::S(user.updated_at.to_rfc3339()));
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(user.created_at.to_rfc3339()),
+        );
+        item.insert(
+            "updated_at".to_string(),
+            AttributeValue::S(user.updated_at.to_rfc3339()),
+        );
         item
     }
 

@@ -28,16 +28,34 @@ impl DynamoDbImpersonationSessionRepository {
     fn to_item(session: &ImpersonationSession) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(session.id.to_string()));
-        item.insert("admin_id".to_string(), AttributeValue::S(session.admin_id.to_string()));
-        item.insert("target_user_id".to_string(), AttributeValue::S(session.target_user_id.to_string()));
-        item.insert("original_session_id".to_string(), AttributeValue::S(session.original_session_id.to_string()));
-        item.insert("impersonation_session_id".to_string(), AttributeValue::S(session.impersonation_session_id.to_string()));
+        item.insert(
+            "admin_id".to_string(),
+            AttributeValue::S(session.admin_id.to_string()),
+        );
+        item.insert(
+            "target_user_id".to_string(),
+            AttributeValue::S(session.target_user_id.to_string()),
+        );
+        item.insert(
+            "original_session_id".to_string(),
+            AttributeValue::S(session.original_session_id.to_string()),
+        );
+        item.insert(
+            "impersonation_session_id".to_string(),
+            AttributeValue::S(session.impersonation_session_id.to_string()),
+        );
         if let Some(ref reason) = session.reason {
             item.insert("reason".to_string(), AttributeValue::S(reason.clone()));
         }
-        item.insert("started_at".to_string(), AttributeValue::S(session.started_at.to_rfc3339()));
+        item.insert(
+            "started_at".to_string(),
+            AttributeValue::S(session.started_at.to_rfc3339()),
+        );
         if let Some(ref ended_at) = session.ended_at {
-            item.insert("ended_at".to_string(), AttributeValue::S(ended_at.to_rfc3339()));
+            item.insert(
+                "ended_at".to_string(),
+                AttributeValue::S(ended_at.to_rfc3339()),
+            );
         }
         item
     }
@@ -139,7 +157,10 @@ impl ImpersonationSessionRepository for DynamoDbImpersonationSessionRepository {
             .table_name(self.table_name())
             .index_name("target_user_id-index")
             .key_condition_expression("target_user_id = :target_user_id")
-            .expression_attribute_values(":target_user_id", AttributeValue::S(target_user_id.to_string()))
+            .expression_attribute_values(
+                ":target_user_id",
+                AttributeValue::S(target_user_id.to_string()),
+            )
             .send()
             .await
             .map_err(|e| TsaError::Database(e.to_string()))?;
@@ -167,9 +188,7 @@ impl ImpersonationSessionRepository for DynamoDbImpersonationSessionRepository {
             .await
             .map_err(|e| TsaError::Database(e.to_string()))?;
 
-        self.find_by_id(id)
-            .await?
-            .ok_or(TsaError::SessionNotFound)
+        self.find_by_id(id).await?.ok_or(TsaError::SessionNotFound)
     }
 
     async fn delete(&self, id: Uuid) -> Result<()> {

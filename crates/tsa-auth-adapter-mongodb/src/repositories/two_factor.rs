@@ -17,16 +17,13 @@ impl MongoDbTwoFactorRepository {
 #[async_trait]
 impl TwoFactorRepository for MongoDbTwoFactorRepository {
     async fn create(&self, two_factor: &TwoFactor) -> Result<TwoFactor> {
-        self.collection
-            .insert_one(two_factor)
-            .await
-            .map_err(|e| {
-                if e.to_string().contains("duplicate key") {
-                    TsaError::TwoFactorAlreadyEnabled
-                } else {
-                    TsaError::Database(e.to_string())
-                }
-            })?;
+        self.collection.insert_one(two_factor).await.map_err(|e| {
+            if e.to_string().contains("duplicate key") {
+                TsaError::TwoFactorAlreadyEnabled
+            } else {
+                TsaError::Database(e.to_string())
+            }
+        })?;
         Ok(two_factor.clone())
     }
 

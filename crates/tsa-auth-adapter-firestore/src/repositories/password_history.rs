@@ -31,11 +31,7 @@ impl PasswordHistoryRepository for FirestorePasswordHistoryRepository {
     async fn find_by_user(&self, user_id: Uuid, limit: u32) -> Result<Vec<PasswordHistory>> {
         let mut histories: Vec<PasswordHistory> = self
             .client
-            .find_all_by_field(
-                COLLECTION_PASSWORD_HISTORY,
-                "user_id",
-                &user_id.to_string(),
-            )
+            .find_all_by_field(COLLECTION_PASSWORD_HISTORY, "user_id", &user_id.to_string())
             .await?;
         histories.sort_by(|a, b| b.created_at.cmp(&a.created_at));
         Ok(histories.into_iter().take(limit as usize).collect())
@@ -44,18 +40,12 @@ impl PasswordHistoryRepository for FirestorePasswordHistoryRepository {
     async fn delete_old_entries(&self, user_id: Uuid, keep_count: u32) -> Result<u64> {
         let mut histories: Vec<PasswordHistory> = self
             .client
-            .find_all_by_field(
-                COLLECTION_PASSWORD_HISTORY,
-                "user_id",
-                &user_id.to_string(),
-            )
+            .find_all_by_field(COLLECTION_PASSWORD_HISTORY, "user_id", &user_id.to_string())
             .await?;
         histories.sort_by(|a, b| b.created_at.cmp(&a.created_at));
 
-        let to_delete: Vec<PasswordHistory> = histories
-            .into_iter()
-            .skip(keep_count as usize)
-            .collect();
+        let to_delete: Vec<PasswordHistory> =
+            histories.into_iter().skip(keep_count as usize).collect();
 
         let mut count = 0u64;
         for history in to_delete {
@@ -71,11 +61,7 @@ impl PasswordHistoryRepository for FirestorePasswordHistoryRepository {
     async fn delete_by_user(&self, user_id: Uuid) -> Result<()> {
         let histories: Vec<PasswordHistory> = self
             .client
-            .find_all_by_field(
-                COLLECTION_PASSWORD_HISTORY,
-                "user_id",
-                &user_id.to_string(),
-            )
+            .find_all_by_field(COLLECTION_PASSWORD_HISTORY, "user_id", &user_id.to_string())
             .await?;
         for history in histories {
             self.client

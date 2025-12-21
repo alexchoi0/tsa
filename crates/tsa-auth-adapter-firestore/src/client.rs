@@ -298,12 +298,10 @@ fn firestore_value_to_json(value: &Value) -> serde_json::Value {
             let dt = Utc.timestamp_opt(ts.seconds, ts.nanos as u32).unwrap();
             serde_json::Value::String(dt.to_rfc3339())
         }
-        Some(ValueType::BytesValue(bytes)) => {
-            serde_json::Value::String(base64::Engine::encode(
-                &base64::engine::general_purpose::STANDARD,
-                bytes,
-            ))
-        }
+        Some(ValueType::BytesValue(bytes)) => serde_json::Value::String(base64::Engine::encode(
+            &base64::engine::general_purpose::STANDARD,
+            bytes,
+        )),
         Some(ValueType::ReferenceValue(r)) => serde_json::Value::String(r.clone()),
         Some(ValueType::GeoPointValue(geo)) => {
             serde_json::json!({"latitude": geo.latitude, "longitude": geo.longitude})

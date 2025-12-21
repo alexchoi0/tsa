@@ -99,11 +99,7 @@ impl IpRuleRepository for SeaOrmIpRuleRepository {
     async fn find_active(&self) -> Result<Vec<IpRule>> {
         let now = Utc::now();
         let results = Entity::find()
-            .filter(
-                Column::ExpiresAt
-                    .is_null()
-                    .or(Column::ExpiresAt.gt(now)),
-            )
+            .filter(Column::ExpiresAt.is_null().or(Column::ExpiresAt.gt(now)))
             .all(self.db.as_ref())
             .await
             .map_err(|e| TsaError::Database(e.to_string()))?;

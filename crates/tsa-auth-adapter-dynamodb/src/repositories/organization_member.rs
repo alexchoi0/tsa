@@ -1,7 +1,9 @@
 use async_trait::async_trait;
 use aws_sdk_dynamodb::{types::AttributeValue, Client};
 use std::collections::HashMap;
-use tsa_auth_core::{OrganizationMember, OrganizationMemberRepository, OrganizationRole, Result, TsaError};
+use tsa_auth_core::{
+    OrganizationMember, OrganizationMemberRepository, OrganizationRole, Result, TsaError,
+};
 use uuid::Uuid;
 
 use super::utils::*;
@@ -28,12 +30,30 @@ impl DynamoDbOrganizationMemberRepository {
     fn to_item(member: &OrganizationMember) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(member.id.to_string()));
-        item.insert("organization_id".to_string(), AttributeValue::S(member.organization_id.to_string()));
-        item.insert("user_id".to_string(), AttributeValue::S(member.user_id.to_string()));
-        item.insert("org_user_key".to_string(), AttributeValue::S(format!("{}#{}", member.organization_id, member.user_id)));
-        item.insert("role".to_string(), AttributeValue::S(member.role.to_string()));
-        item.insert("created_at".to_string(), AttributeValue::S(member.created_at.to_rfc3339()));
-        item.insert("updated_at".to_string(), AttributeValue::S(member.updated_at.to_rfc3339()));
+        item.insert(
+            "organization_id".to_string(),
+            AttributeValue::S(member.organization_id.to_string()),
+        );
+        item.insert(
+            "user_id".to_string(),
+            AttributeValue::S(member.user_id.to_string()),
+        );
+        item.insert(
+            "org_user_key".to_string(),
+            AttributeValue::S(format!("{}#{}", member.organization_id, member.user_id)),
+        );
+        item.insert(
+            "role".to_string(),
+            AttributeValue::S(member.role.to_string()),
+        );
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(member.created_at.to_rfc3339()),
+        );
+        item.insert(
+            "updated_at".to_string(),
+            AttributeValue::S(member.updated_at.to_rfc3339()),
+        );
         item
     }
 

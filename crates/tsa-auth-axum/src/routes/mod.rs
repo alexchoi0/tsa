@@ -44,12 +44,30 @@ pub fn create_router(state: Arc<AppState>) -> Router {
         .route("/organizations", get(organizations::list_organizations))
         .route("/organizations", post(organizations::create_organization))
         .route("/organizations/:slug", get(organizations::get_organization))
-        .route("/organizations/:id", put(organizations::update_organization))
-        .route("/organizations/:id", delete(organizations::delete_organization))
-        .route("/organizations/:id/members", get(organizations::list_members))
-        .route("/organizations/:id/members", post(organizations::add_member))
-        .route("/organizations/:id/members/:user_id", put(organizations::update_member))
-        .route("/organizations/:id/members/:user_id", delete(organizations::remove_member));
+        .route(
+            "/organizations/:id",
+            put(organizations::update_organization),
+        )
+        .route(
+            "/organizations/:id",
+            delete(organizations::delete_organization),
+        )
+        .route(
+            "/organizations/:id/members",
+            get(organizations::list_members),
+        )
+        .route(
+            "/organizations/:id/members",
+            post(organizations::add_member),
+        )
+        .route(
+            "/organizations/:id/members/:user_id",
+            put(organizations::update_member),
+        )
+        .route(
+            "/organizations/:id/members/:user_id",
+            delete(organizations::remove_member),
+        );
 
     Router::new()
         .route("/health", get(health::health_check))

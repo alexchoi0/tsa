@@ -1,8 +1,6 @@
 use async_trait::async_trait;
 use chrono::Utc;
-use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set,
-};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
 use std::sync::Arc;
 use tsa_auth_core::{Result, Session, SessionRepository, TsaError};
 use uuid::Uuid;

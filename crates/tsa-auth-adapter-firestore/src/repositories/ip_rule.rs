@@ -48,7 +48,7 @@ impl IpRuleRepository for FirestoreIpRuleRepository {
         let now = Utc::now();
         Ok(rules
             .into_iter()
-            .filter(|rule| rule.expires_at.map_or(true, |expires| expires > now))
+            .filter(|rule| rule.expires_at.is_none_or(|expires| expires > now))
             .collect())
     }
 

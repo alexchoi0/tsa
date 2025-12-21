@@ -53,7 +53,9 @@ impl PermissionDef {
     pub fn approval_policy(&self) -> Option<&str> {
         match self {
             PermissionDef::Simple(_) => None,
-            PermissionDef::WithApproval { requires_approval, .. } => Some(requires_approval),
+            PermissionDef::WithApproval {
+                requires_approval, ..
+            } => Some(requires_approval),
         }
     }
 }
@@ -114,7 +116,8 @@ pub struct ApproversDef {
 impl RbacConfig {
     pub fn from_yaml(yaml: &str) -> Result<Self> {
         let yaml = Self::interpolate_env_vars(yaml);
-        serde_yaml::from_str(&yaml).map_err(|e| TsaError::Configuration(format!("Invalid RBAC YAML: {}", e)))
+        serde_yaml::from_str(&yaml)
+            .map_err(|e| TsaError::Configuration(format!("Invalid RBAC YAML: {}", e)))
     }
 
     pub fn from_file(path: impl AsRef<Path>) -> Result<Self> {
@@ -143,7 +146,10 @@ impl RbacConfig {
         for (role_name, role) in &self.roles {
             if let Some(ref inherits) = role.inherits {
                 if !self.roles.contains_key(inherits) {
-                    errors.push(format!("Role '{}' inherits from unknown role '{}'", role_name, inherits));
+                    errors.push(format!(
+                        "Role '{}' inherits from unknown role '{}'",
+                        role_name, inherits
+                    ));
                 }
                 if self.has_circular_inheritance(role_name, &mut HashSet::new()) {
                     errors.push(format!("Role '{}' has circular inheritance", role_name));
@@ -151,7 +157,10 @@ impl RbacConfig {
             }
 
             for perm in &role.permissions {
-                if let PermissionDef::WithApproval { requires_approval, .. } = perm {
+                if let PermissionDef::WithApproval {
+                    requires_approval, ..
+                } = perm
+                {
                     if !self.approval_policies.contains_key(requires_approval) {
                         errors.push(format!(
                             "Role '{}' references unknown approval policy '{}'",
@@ -216,7 +225,10 @@ impl RbacConfig {
         if errors.is_empty() {
             Ok(())
         } else {
-            Err(TsaError::Configuration(format!("RBAC validation errors:\n- {}", errors.join("\n- "))))
+            Err(TsaError::Configuration(format!(
+                "RBAC validation errors:\n- {}",
+                errors.join("\n- ")
+            )))
         }
     }
 
@@ -343,6 +355,9 @@ roles:
         let config = RbacConfig::from_yaml(yaml).unwrap();
         let result = config.validate();
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("action 'delete' is not defined"));
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("action 'delete' is not defined"));
     }
 }

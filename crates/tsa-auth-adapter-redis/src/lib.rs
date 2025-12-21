@@ -347,8 +347,7 @@ impl SessionRepository for RedisSessionRepository {
         let user_key = format!("{}{}", SESSION_USER_PREFIX, session.user_id);
 
         let ttl = (session.expires_at - Utc::now()).num_seconds().max(0) as u64;
-        let json =
-            serde_json::to_string(session).map_err(|e| TsaError::Internal(e.to_string()))?;
+        let json = serde_json::to_string(session).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let _: () = conn
             .set_ex(&key, &json, ttl)
@@ -432,8 +431,7 @@ impl SessionRepository for RedisSessionRepository {
         let token_key = format!("{}{}", SESSION_TOKEN_PREFIX, session.token_hash);
 
         let ttl = (session.expires_at - Utc::now()).num_seconds().max(0) as u64;
-        let json =
-            serde_json::to_string(session).map_err(|e| TsaError::Internal(e.to_string()))?;
+        let json = serde_json::to_string(session).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let _: () = conn
             .set_ex(&key, &json, ttl)
@@ -502,8 +500,7 @@ impl AccountRepository for RedisAccountRepository {
         );
         let user_key = format!("{}{}", ACCOUNT_USER_PREFIX, account.user_id);
 
-        let json =
-            serde_json::to_string(account).map_err(|e| TsaError::Internal(e.to_string()))?;
+        let json = serde_json::to_string(account).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let _: () = conn
             .set(&key, &json)
@@ -529,7 +526,10 @@ impl AccountRepository for RedisAccountRepository {
         provider_account_id: &str,
     ) -> Result<Option<Account>> {
         let mut conn = self.conn.clone();
-        let provider_key = format!("{}{}:{}", ACCOUNT_PROVIDER_PREFIX, provider, provider_account_id);
+        let provider_key = format!(
+            "{}{}:{}",
+            ACCOUNT_PROVIDER_PREFIX, provider, provider_account_id
+        );
 
         let account_id: Option<String> = conn
             .get(&provider_key)
@@ -1130,7 +1130,10 @@ impl OrganizationInvitationRepository for RedisOrganizationInvitationRepository 
         let mut conn = self.conn.clone();
         let key = format!("{}{}", ORG_INVITATION_PREFIX, invitation.id);
         let token_key = format!("{}{}", ORG_INVITATION_TOKEN_PREFIX, invitation.token_hash);
-        let org_key = format!("{}{}", ORG_INVITATION_ORG_PREFIX, invitation.organization_id);
+        let org_key = format!(
+            "{}{}",
+            ORG_INVITATION_ORG_PREFIX, invitation.organization_id
+        );
         let email_key = format!(
             "{}{}",
             ORG_INVITATION_EMAIL_PREFIX,
@@ -1253,8 +1256,7 @@ impl OrganizationInvitationRepository for RedisOrganizationInvitationRepository 
     ) -> Result<Option<OrganizationInvitation>> {
         let invitations = self.find_by_organization(organization_id).await?;
         Ok(invitations.into_iter().find(|i| {
-            i.email.to_lowercase() == email.to_lowercase()
-                && i.status == InvitationStatus::Pending
+            i.email.to_lowercase() == email.to_lowercase() && i.status == InvitationStatus::Pending
         }))
     }
 
@@ -1287,7 +1289,10 @@ impl OrganizationInvitationRepository for RedisOrganizationInvitationRepository 
         if let Some(invitation) = self.find_by_id(id).await? {
             let key = format!("{}{}", ORG_INVITATION_PREFIX, id);
             let token_key = format!("{}{}", ORG_INVITATION_TOKEN_PREFIX, invitation.token_hash);
-            let org_key = format!("{}{}", ORG_INVITATION_ORG_PREFIX, invitation.organization_id);
+            let org_key = format!(
+                "{}{}",
+                ORG_INVITATION_ORG_PREFIX, invitation.organization_id
+            );
             let email_key = format!(
                 "{}{}",
                 ORG_INVITATION_EMAIL_PREFIX,
@@ -1560,7 +1565,10 @@ impl PasskeyRepository for RedisPasskeyRepository {
         let credential_key = format!(
             "{}{}",
             PASSKEY_CREDENTIAL_PREFIX,
-            base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &passkey.credential_id)
+            base64::Engine::encode(
+                &base64::engine::general_purpose::STANDARD,
+                &passkey.credential_id
+            )
         );
         let user_key = format!("{}{}", PASSKEY_USER_PREFIX, passkey.user_id);
 
@@ -1677,7 +1685,10 @@ impl PasskeyRepository for RedisPasskeyRepository {
             let credential_key = format!(
                 "{}{}",
                 PASSKEY_CREDENTIAL_PREFIX,
-                base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &passkey.credential_id)
+                base64::Engine::encode(
+                    &base64::engine::general_purpose::STANDARD,
+                    &passkey.credential_id
+                )
             );
             let user_key = format!("{}{}", PASSKEY_USER_PREFIX, passkey.user_id);
 
@@ -1720,7 +1731,10 @@ impl PasskeyChallengeRepository for RedisPasskeyChallengeRepository {
         let data_key = format!(
             "{}{}",
             PASSKEY_CHALLENGE_DATA_PREFIX,
-            base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &challenge.challenge)
+            base64::Engine::encode(
+                &base64::engine::general_purpose::STANDARD,
+                &challenge.challenge
+            )
         );
 
         let ttl = (challenge.expires_at - Utc::now()).num_seconds().max(0) as u64;
@@ -1789,7 +1803,10 @@ impl PasskeyChallengeRepository for RedisPasskeyChallengeRepository {
             let data_key = format!(
                 "{}{}",
                 PASSKEY_CHALLENGE_DATA_PREFIX,
-                base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &challenge.challenge)
+                base64::Engine::encode(
+                    &base64::engine::general_purpose::STANDARD,
+                    &challenge.challenge
+                )
             );
 
             let _: () = conn
@@ -1851,13 +1868,21 @@ impl AuditLogRepository for RedisAuditLogRepository {
         }
 
         let _: () = conn
-            .zadd(AUDIT_LOG_RECENT_PREFIX, log.id.to_string(), log.created_at.timestamp())
+            .zadd(
+                AUDIT_LOG_RECENT_PREFIX,
+                log.id.to_string(),
+                log.created_at.timestamp(),
+            )
             .await
             .map_err(|e| TsaError::Database(e.to_string()))?;
 
         if !log.success {
             let _: () = conn
-                .zadd(AUDIT_LOG_FAILED_PREFIX, log.id.to_string(), log.created_at.timestamp())
+                .zadd(
+                    AUDIT_LOG_FAILED_PREFIX,
+                    log.id.to_string(),
+                    log.created_at.timestamp(),
+                )
                 .await
                 .map_err(|e| TsaError::Database(e.to_string()))?;
         }
@@ -1956,7 +1981,11 @@ impl AuditLogRepository for RedisAuditLogRepository {
         let mut conn = self.conn.clone();
 
         let log_ids: Vec<String> = conn
-            .zrevrange(AUDIT_LOG_RECENT_PREFIX, offset as isize, (offset + limit - 1) as isize)
+            .zrevrange(
+                AUDIT_LOG_RECENT_PREFIX,
+                offset as isize,
+                (offset + limit - 1) as isize,
+            )
             .await
             .map_err(|e| TsaError::Database(e.to_string()))?;
 
@@ -1976,7 +2005,11 @@ impl AuditLogRepository for RedisAuditLogRepository {
         let mut conn = self.conn.clone();
 
         let log_ids: Vec<String> = conn
-            .zrevrange(AUDIT_LOG_FAILED_PREFIX, offset as isize, (offset + limit - 1) as isize)
+            .zrevrange(
+                AUDIT_LOG_FAILED_PREFIX,
+                offset as isize,
+                (offset + limit - 1) as isize,
+            )
             .await
             .map_err(|e| TsaError::Database(e.to_string()))?;
 
@@ -2047,8 +2080,7 @@ impl AccountLockoutRepository for RedisAccountLockoutRepository {
         let key = format!("{}{}", ACCOUNT_LOCKOUT_PREFIX, lockout.id);
         let user_key = format!("{}{}", ACCOUNT_LOCKOUT_USER_PREFIX, lockout.user_id);
 
-        let json =
-            serde_json::to_string(lockout).map_err(|e| TsaError::Internal(e.to_string()))?;
+        let json = serde_json::to_string(lockout).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let _: () = conn
             .set(&key, &json)
@@ -2097,8 +2129,7 @@ impl AccountLockoutRepository for RedisAccountLockoutRepository {
         let mut conn = self.conn.clone();
         let key = format!("{}{}", ACCOUNT_LOCKOUT_PREFIX, lockout.id);
 
-        let json =
-            serde_json::to_string(lockout).map_err(|e| TsaError::Internal(e.to_string()))?;
+        let json = serde_json::to_string(lockout).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let _: () = conn
             .set(&key, &json)
@@ -2181,8 +2212,7 @@ impl PasswordHistoryRepository for RedisPasswordHistoryRepository {
         let key = format!("{}{}", PASSWORD_HISTORY_PREFIX, history.id);
         let user_key = format!("{}{}", PASSWORD_HISTORY_USER_PREFIX, history.user_id);
 
-        let json =
-            serde_json::to_string(history).map_err(|e| TsaError::Internal(e.to_string()))?;
+        let json = serde_json::to_string(history).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let _: () = conn
             .set(&key, &json)
@@ -2190,7 +2220,11 @@ impl PasswordHistoryRepository for RedisPasswordHistoryRepository {
             .map_err(|e| TsaError::Database(e.to_string()))?;
 
         let _: () = conn
-            .zadd(&user_key, history.id.to_string(), history.created_at.timestamp())
+            .zadd(
+                &user_key,
+                history.id.to_string(),
+                history.created_at.timestamp(),
+            )
             .await
             .map_err(|e| TsaError::Database(e.to_string()))?;
 
@@ -2449,8 +2483,7 @@ impl ImpersonationSessionRepository for RedisImpersonationSessionRepository {
             IMPERSONATION_SESSION_TARGET_PREFIX, session.target_user_id
         );
 
-        let json =
-            serde_json::to_string(session).map_err(|e| TsaError::Internal(e.to_string()))?;
+        let json = serde_json::to_string(session).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let _: () = conn
             .set(&key, &json)
@@ -2576,7 +2609,9 @@ impl ImpersonationSessionRepository for RedisImpersonationSessionRepository {
 
             Ok(session)
         } else {
-            Err(TsaError::Internal("Impersonation session not found".to_string()))
+            Err(TsaError::Internal(
+                "Impersonation session not found".to_string(),
+            ))
         }
     }
 

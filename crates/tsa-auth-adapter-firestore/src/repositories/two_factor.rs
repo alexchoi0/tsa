@@ -19,7 +19,11 @@ impl FirestoreTwoFactorRepository {
 impl TwoFactorRepository for FirestoreTwoFactorRepository {
     async fn create(&self, two_factor: &TwoFactor) -> Result<TwoFactor> {
         self.client
-            .create_document(COLLECTION_TWO_FACTORS, &two_factor.id.to_string(), two_factor)
+            .create_document(
+                COLLECTION_TWO_FACTORS,
+                &two_factor.id.to_string(),
+                two_factor,
+            )
             .await?;
         Ok(two_factor.clone())
     }

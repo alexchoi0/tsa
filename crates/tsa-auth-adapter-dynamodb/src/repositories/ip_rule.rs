@@ -34,18 +34,33 @@ impl DynamoDbIpRuleRepository {
 
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(rule.id.to_string()));
-        item.insert("ip_pattern".to_string(), AttributeValue::S(rule.ip_pattern.clone()));
-        item.insert("rule_type".to_string(), AttributeValue::S(rule_type_str.to_string()));
+        item.insert(
+            "ip_pattern".to_string(),
+            AttributeValue::S(rule.ip_pattern.clone()),
+        );
+        item.insert(
+            "rule_type".to_string(),
+            AttributeValue::S(rule_type_str.to_string()),
+        );
         if let Some(ref desc) = rule.description {
             item.insert("description".to_string(), AttributeValue::S(desc.clone()));
         }
         if let Some(ref expires) = rule.expires_at {
-            item.insert("expires_at".to_string(), AttributeValue::S(expires.to_rfc3339()));
+            item.insert(
+                "expires_at".to_string(),
+                AttributeValue::S(expires.to_rfc3339()),
+            );
         }
         if let Some(ref created_by) = rule.created_by {
-            item.insert("created_by".to_string(), AttributeValue::S(created_by.to_string()));
+            item.insert(
+                "created_by".to_string(),
+                AttributeValue::S(created_by.to_string()),
+            );
         }
-        item.insert("created_at".to_string(), AttributeValue::S(rule.created_at.to_rfc3339()));
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(rule.created_at.to_rfc3339()),
+        );
         item
     }
 
@@ -146,9 +161,7 @@ impl IpRuleRepository for DynamoDbIpRuleRepository {
 
         Ok(all_rules
             .into_iter()
-            .filter(|rule| {
-                rule.expires_at.is_none() || rule.expires_at.unwrap() > now
-            })
+            .filter(|rule| rule.expires_at.is_none() || rule.expires_at.unwrap() > now)
             .collect())
     }
 
@@ -180,9 +193,7 @@ impl IpRuleRepository for DynamoDbIpRuleRepository {
 
         let expired: Vec<_> = all_rules
             .into_iter()
-            .filter(|rule| {
-                rule.expires_at.map_or(false, |exp| exp < now)
-            })
+            .filter(|rule| rule.expires_at.is_some_and(|exp| exp < now))
             .collect();
 
         let count = expired.len() as u64;

@@ -28,9 +28,18 @@ impl DynamoDbPasswordHistoryRepository {
     fn to_item(history: &PasswordHistory) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(history.id.to_string()));
-        item.insert("user_id".to_string(), AttributeValue::S(history.user_id.to_string()));
-        item.insert("password_hash".to_string(), AttributeValue::S(history.password_hash.clone()));
-        item.insert("created_at".to_string(), AttributeValue::S(history.created_at.to_rfc3339()));
+        item.insert(
+            "user_id".to_string(),
+            AttributeValue::S(history.user_id.to_string()),
+        );
+        item.insert(
+            "password_hash".to_string(),
+            AttributeValue::S(history.password_hash.clone()),
+        );
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(history.created_at.to_rfc3339()),
+        );
         item
     }
 

@@ -34,18 +34,38 @@ impl WebhookConfig {
     pub fn with_all_events(mut self) -> Self {
         use WebhookEvent::*;
         self.events = [
-            UserCreated, UserUpdated, UserDeleted, EmailVerified,
-            SigninSuccess, SigninFailed, SignoutSuccess,
-            PasswordChanged, PasswordResetRequested,
-            SessionCreated, SessionRevoked,
-            TwoFactorEnabled, TwoFactorDisabled,
-            OrganizationCreated, OrganizationUpdated, OrganizationDeleted,
-            MemberAdded, MemberRemoved, MemberRoleChanged,
-            InvitationSent, InvitationAccepted, InvitationRevoked,
-            ApiKeyCreated, ApiKeyRevoked,
-            MagicLinkSent, MagicLinkVerified,
-            OtpSent, OtpVerified, PhoneVerified,
-        ].into_iter().collect();
+            UserCreated,
+            UserUpdated,
+            UserDeleted,
+            EmailVerified,
+            SigninSuccess,
+            SigninFailed,
+            SignoutSuccess,
+            PasswordChanged,
+            PasswordResetRequested,
+            SessionCreated,
+            SessionRevoked,
+            TwoFactorEnabled,
+            TwoFactorDisabled,
+            OrganizationCreated,
+            OrganizationUpdated,
+            OrganizationDeleted,
+            MemberAdded,
+            MemberRemoved,
+            MemberRoleChanged,
+            InvitationSent,
+            InvitationAccepted,
+            InvitationRevoked,
+            ApiKeyCreated,
+            ApiKeyRevoked,
+            MagicLinkSent,
+            MagicLinkVerified,
+            OtpSent,
+            OtpVerified,
+            PhoneVerified,
+        ]
+        .into_iter()
+        .collect();
         self
     }
 
@@ -110,8 +130,8 @@ impl WebhookSender for HttpWebhookSender {
             return Ok(());
         }
 
-        let body = serde_json::to_string(&payload)
-            .map_err(|e| TsaError::Internal(e.to_string()))?;
+        let body =
+            serde_json::to_string(&payload).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let timestamp = payload.timestamp.timestamp();
         let signature = self.sign_payload(&body, timestamp);
@@ -124,7 +144,8 @@ impl WebhookSender for HttpWebhookSender {
                 tokio::time::sleep(delay).await;
             }
 
-            let result = self.client
+            let result = self
+                .client
                 .post(&self.config.url)
                 .header("Content-Type", "application/json")
                 .header("X-TSA-Signature", &signature)
@@ -179,7 +200,9 @@ impl AsyncWebhookSender {
 #[async_trait]
 impl WebhookSender for AsyncWebhookSender {
     async fn send(&self, payload: WebhookPayload) -> Result<()> {
-        self.tx.send(payload).map_err(|e| TsaError::Internal(e.to_string()))
+        self.tx
+            .send(payload)
+            .map_err(|e| TsaError::Internal(e.to_string()))
     }
 }
 
@@ -211,7 +234,7 @@ pub fn verify_webhook_signature(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tsa_auth_core::{WebhookData, UserWebhookData};
+    use tsa_auth_core::{UserWebhookData, WebhookData};
     use uuid::Uuid;
 
     #[test]

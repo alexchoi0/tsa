@@ -1,7 +1,7 @@
 use mongodb::Database;
 use tsa_auth_core::{
-    Account, ApiKey, Organization, OrganizationInvitation, OrganizationMember, Session,
-    TwoFactor, User, VerificationToken,
+    Account, ApiKey, Organization, OrganizationInvitation, OrganizationMember, Session, TwoFactor,
+    User, VerificationToken,
 };
 
 use crate::repositories::{

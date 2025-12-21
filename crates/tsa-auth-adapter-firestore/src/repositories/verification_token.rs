@@ -20,11 +20,7 @@ impl FirestoreVerificationTokenRepository {
 impl VerificationTokenRepository for FirestoreVerificationTokenRepository {
     async fn create(&self, token: &VerificationToken) -> Result<VerificationToken> {
         self.client
-            .create_document(
-                COLLECTION_VERIFICATION_TOKENS,
-                &token.id.to_string(),
-                token,
-            )
+            .create_document(COLLECTION_VERIFICATION_TOKENS, &token.id.to_string(), token)
             .await?;
         Ok(token.clone())
     }

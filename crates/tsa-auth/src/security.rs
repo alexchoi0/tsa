@@ -50,6 +50,7 @@ impl<A: Adapter> SecurityManager<A> {
         Self { adapter, config }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn log_audit(
         &self,
         action: AuditAction,
@@ -82,7 +83,12 @@ impl<A: Adapter> SecurityManager<A> {
     }
 
     pub async fn check_account_locked(&self, user_id: Uuid) -> Result<bool> {
-        if let Some(lockout) = self.adapter.account_lockouts().find_by_user(user_id).await? {
+        if let Some(lockout) = self
+            .adapter
+            .account_lockouts()
+            .find_by_user(user_id)
+            .await?
+        {
             if let Some(locked_until) = lockout.locked_until {
                 if locked_until > Utc::now() {
                     return Ok(true);
@@ -191,11 +197,7 @@ impl<A: Adapter> SecurityManager<A> {
         Ok(true)
     }
 
-    pub async fn add_password_to_history(
-        &self,
-        user_id: Uuid,
-        password_hash: &str,
-    ) -> Result<()> {
+    pub async fn add_password_to_history(&self, user_id: Uuid, password_hash: &str) -> Result<()> {
         if self.config.password_policy.password_history_count == 0 {
             return Ok(());
         }
@@ -300,6 +302,7 @@ impl<A: Adapter> SecurityManager<A> {
         Ok(created)
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn start_impersonation(
         &self,
         admin_id: Uuid,
@@ -321,7 +324,11 @@ impl<A: Adapter> SecurityManager<A> {
             ended_at: None,
         };
 
-        let created = self.adapter.impersonation_sessions().create(&session).await?;
+        let created = self
+            .adapter
+            .impersonation_sessions()
+            .create(&session)
+            .await?;
 
         self.log_audit(
             AuditAction::ImpersonationStarted,
@@ -519,7 +526,10 @@ mod tests {
             .await
             .unwrap();
 
-        let logs = manager.get_audit_logs_for_user(user_id, 10, 0).await.unwrap();
+        let logs = manager
+            .get_audit_logs_for_user(user_id, 10, 0)
+            .await
+            .unwrap();
         assert_eq!(logs.len(), 1);
         assert_eq!(logs[0].action, AuditAction::SigninSuccess);
     }

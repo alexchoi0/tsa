@@ -27,14 +27,38 @@ impl DynamoDbTwoFactorRepository {
 
     fn to_item(two_factor: &TwoFactor) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
-        item.insert("id".to_string(), AttributeValue::S(two_factor.id.to_string()));
-        item.insert("user_id".to_string(), AttributeValue::S(two_factor.user_id.to_string()));
-        item.insert("secret".to_string(), AttributeValue::S(two_factor.secret.clone()));
-        item.insert("backup_codes".to_string(), string_vec_to_attr(&two_factor.backup_codes));
-        item.insert("enabled".to_string(), AttributeValue::Bool(two_factor.enabled));
-        item.insert("verified".to_string(), AttributeValue::Bool(two_factor.verified));
-        item.insert("created_at".to_string(), AttributeValue::S(two_factor.created_at.to_rfc3339()));
-        item.insert("updated_at".to_string(), AttributeValue::S(two_factor.updated_at.to_rfc3339()));
+        item.insert(
+            "id".to_string(),
+            AttributeValue::S(two_factor.id.to_string()),
+        );
+        item.insert(
+            "user_id".to_string(),
+            AttributeValue::S(two_factor.user_id.to_string()),
+        );
+        item.insert(
+            "secret".to_string(),
+            AttributeValue::S(two_factor.secret.clone()),
+        );
+        item.insert(
+            "backup_codes".to_string(),
+            string_vec_to_attr(&two_factor.backup_codes),
+        );
+        item.insert(
+            "enabled".to_string(),
+            AttributeValue::Bool(two_factor.enabled),
+        );
+        item.insert(
+            "verified".to_string(),
+            AttributeValue::Bool(two_factor.verified),
+        );
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(two_factor.created_at.to_rfc3339()),
+        );
+        item.insert(
+            "updated_at".to_string(),
+            AttributeValue::S(two_factor.updated_at.to_rfc3339()),
+        );
         item
     }
 

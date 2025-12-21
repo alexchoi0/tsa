@@ -29,21 +29,42 @@ impl DynamoDbApiKeyRepository {
     fn to_item(api_key: &ApiKey) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(api_key.id.to_string()));
-        item.insert("user_id".to_string(), AttributeValue::S(api_key.user_id.to_string()));
+        item.insert(
+            "user_id".to_string(),
+            AttributeValue::S(api_key.user_id.to_string()),
+        );
         if let Some(ref org_id) = api_key.organization_id {
-            item.insert("organization_id".to_string(), AttributeValue::S(org_id.to_string()));
+            item.insert(
+                "organization_id".to_string(),
+                AttributeValue::S(org_id.to_string()),
+            );
         }
         item.insert("name".to_string(), AttributeValue::S(api_key.name.clone()));
-        item.insert("key_hash".to_string(), AttributeValue::S(api_key.key_hash.clone()));
-        item.insert("prefix".to_string(), AttributeValue::S(api_key.prefix.clone()));
+        item.insert(
+            "key_hash".to_string(),
+            AttributeValue::S(api_key.key_hash.clone()),
+        );
+        item.insert(
+            "prefix".to_string(),
+            AttributeValue::S(api_key.prefix.clone()),
+        );
         item.insert("scopes".to_string(), string_vec_to_attr(&api_key.scopes));
         if let Some(ref expires) = api_key.expires_at {
-            item.insert("expires_at".to_string(), AttributeValue::S(expires.to_rfc3339()));
+            item.insert(
+                "expires_at".to_string(),
+                AttributeValue::S(expires.to_rfc3339()),
+            );
         }
         if let Some(ref last_used) = api_key.last_used_at {
-            item.insert("last_used_at".to_string(), AttributeValue::S(last_used.to_rfc3339()));
+            item.insert(
+                "last_used_at".to_string(),
+                AttributeValue::S(last_used.to_rfc3339()),
+            );
         }
-        item.insert("created_at".to_string(), AttributeValue::S(api_key.created_at.to_rfc3339()));
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(api_key.created_at.to_rfc3339()),
+        );
         item
     }
 

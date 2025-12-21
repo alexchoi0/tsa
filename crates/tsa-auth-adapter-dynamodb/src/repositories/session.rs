@@ -29,11 +29,26 @@ impl DynamoDbSessionRepository {
     fn to_item(session: &Session) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(session.id.to_string()));
-        item.insert("user_id".to_string(), AttributeValue::S(session.user_id.to_string()));
-        item.insert("token_hash".to_string(), AttributeValue::S(session.token_hash.clone()));
-        item.insert("expires_at".to_string(), AttributeValue::S(session.expires_at.to_rfc3339()));
-        item.insert("created_at".to_string(), AttributeValue::S(session.created_at.to_rfc3339()));
-        item.insert("ttl".to_string(), AttributeValue::N(session.expires_at.timestamp().to_string()));
+        item.insert(
+            "user_id".to_string(),
+            AttributeValue::S(session.user_id.to_string()),
+        );
+        item.insert(
+            "token_hash".to_string(),
+            AttributeValue::S(session.token_hash.clone()),
+        );
+        item.insert(
+            "expires_at".to_string(),
+            AttributeValue::S(session.expires_at.to_rfc3339()),
+        );
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(session.created_at.to_rfc3339()),
+        );
+        item.insert(
+            "ttl".to_string(),
+            AttributeValue::N(session.expires_at.timestamp().to_string()),
+        );
         if let Some(ref ip) = session.ip_address {
             item.insert("ip_address".to_string(), AttributeValue::S(ip.clone()));
         }

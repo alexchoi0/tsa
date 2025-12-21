@@ -2,9 +2,8 @@ use async_trait::async_trait;
 use oauth2::{
     basic::BasicTokenType, AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken,
     EmptyExtraTokenFields, EndpointNotSet, EndpointSet, PkceCodeChallenge, PkceCodeVerifier,
-    RedirectUrl, RevocationErrorResponseType, Scope, StandardErrorResponse,
-    StandardRevocableToken, StandardTokenIntrospectionResponse, StandardTokenResponse,
-    TokenResponse, TokenUrl,
+    RedirectUrl, RevocationErrorResponseType, Scope, StandardErrorResponse, StandardRevocableToken,
+    StandardTokenIntrospectionResponse, StandardTokenResponse, TokenResponse, TokenUrl,
 };
 use serde::{Deserialize, Serialize};
 use tsa_auth_core::{Result, TsaError};

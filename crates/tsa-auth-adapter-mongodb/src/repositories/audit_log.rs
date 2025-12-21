@@ -7,7 +7,7 @@ use uuid::Uuid;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-struct AuditLogDocument {
+pub(crate) struct AuditLogDocument {
     pub id: Uuid,
     pub user_id: Option<Uuid>,
     pub actor_id: Option<Uuid>,
@@ -24,7 +24,7 @@ struct AuditLogDocument {
 
 impl From<&AuditLog> for AuditLogDocument {
     fn from(log: &AuditLog) -> Self {
-        let action_str = serde_json::to_value(&log.action)
+        let action_str = serde_json::to_value(log.action)
             .ok()
             .and_then(|v| v.as_str().map(String::from))
             .unwrap_or_else(|| "other".to_string());
@@ -74,12 +74,10 @@ pub struct MongoDbAuditLogRepository {
 }
 
 impl MongoDbAuditLogRepository {
-    pub fn new(collection: Collection<AuditLogDocument>) -> Self {
-        Self { collection }
-    }
-
     pub fn from_database(db: &Database) -> Self {
-        Self::new(db.collection::<AuditLogDocument>("audit_logs"))
+        Self {
+            collection: db.collection::<AuditLogDocument>("audit_logs"),
+        }
     }
 }
 
@@ -129,7 +127,7 @@ impl AuditLogRepository for MongoDbAuditLogRepository {
         limit: u32,
         offset: u32,
     ) -> Result<Vec<AuditLog>> {
-        let action_str = serde_json::to_value(&action)
+        let action_str = serde_json::to_value(action)
             .ok()
             .and_then(|v| v.as_str().map(String::from))
             .unwrap_or_else(|| "other".to_string());

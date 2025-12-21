@@ -3,7 +3,9 @@ use aws_sdk_dynamodb::{types::AttributeValue, Client};
 use base64::{engine::general_purpose::STANDARD, Engine};
 use chrono::Utc;
 use std::collections::HashMap;
-use tsa_auth_core::{PasskeyChallenge, PasskeyChallengeRepository, PasskeyChallengeType, Result, TsaError};
+use tsa_auth_core::{
+    PasskeyChallenge, PasskeyChallengeRepository, PasskeyChallengeType, Result, TsaError,
+};
 use uuid::Uuid;
 
 use super::utils::*;
@@ -29,17 +31,44 @@ impl DynamoDbPasskeyChallengeRepository {
 
     fn to_item(challenge: &PasskeyChallenge) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
-        item.insert("id".to_string(), AttributeValue::S(challenge.id.to_string()));
+        item.insert(
+            "id".to_string(),
+            AttributeValue::S(challenge.id.to_string()),
+        );
         if let Some(ref user_id) = challenge.user_id {
-            item.insert("user_id".to_string(), AttributeValue::S(user_id.to_string()));
+            item.insert(
+                "user_id".to_string(),
+                AttributeValue::S(user_id.to_string()),
+            );
         }
-        item.insert("challenge".to_string(), AttributeValue::B(challenge.challenge.clone().into()));
-        item.insert("challenge_b64".to_string(), AttributeValue::S(STANDARD.encode(&challenge.challenge)));
-        item.insert("challenge_type".to_string(), AttributeValue::S(format!("{:?}", challenge.challenge_type)));
-        item.insert("state".to_string(), AttributeValue::B(challenge.state.clone().into()));
-        item.insert("expires_at".to_string(), AttributeValue::S(challenge.expires_at.to_rfc3339()));
-        item.insert("created_at".to_string(), AttributeValue::S(challenge.created_at.to_rfc3339()));
-        item.insert("ttl".to_string(), AttributeValue::N(challenge.expires_at.timestamp().to_string()));
+        item.insert(
+            "challenge".to_string(),
+            AttributeValue::B(challenge.challenge.clone().into()),
+        );
+        item.insert(
+            "challenge_b64".to_string(),
+            AttributeValue::S(STANDARD.encode(&challenge.challenge)),
+        );
+        item.insert(
+            "challenge_type".to_string(),
+            AttributeValue::S(format!("{:?}", challenge.challenge_type)),
+        );
+        item.insert(
+            "state".to_string(),
+            AttributeValue::B(challenge.state.clone().into()),
+        );
+        item.insert(
+            "expires_at".to_string(),
+            AttributeValue::S(challenge.expires_at.to_rfc3339()),
+        );
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(challenge.created_at.to_rfc3339()),
+        );
+        item.insert(
+            "ttl".to_string(),
+            AttributeValue::N(challenge.expires_at.timestamp().to_string()),
+        );
         item
     }
 
@@ -48,7 +77,12 @@ impl DynamoDbPasskeyChallengeRepository {
         let challenge_type = match challenge_type_str.as_str() {
             "Registration" => PasskeyChallengeType::Registration,
             "Authentication" => PasskeyChallengeType::Authentication,
-            _ => return Err(TsaError::Database(format!("Invalid challenge type: {}", challenge_type_str))),
+            _ => {
+                return Err(TsaError::Database(format!(
+                    "Invalid challenge type: {}",
+                    challenge_type_str
+                )))
+            }
         };
 
         Ok(PasskeyChallenge {

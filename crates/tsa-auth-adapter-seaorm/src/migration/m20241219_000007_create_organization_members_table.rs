@@ -23,7 +23,10 @@ impl MigrationTrait for Migration {
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_organization_members_org")
-                            .from(OrganizationMembers::Table, OrganizationMembers::OrganizationId)
+                            .from(
+                                OrganizationMembers::Table,
+                                OrganizationMembers::OrganizationId,
+                            )
                             .to(Organizations::Table, Organizations::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )

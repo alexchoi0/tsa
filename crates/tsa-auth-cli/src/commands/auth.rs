@@ -31,7 +31,12 @@ struct UserResponse {
     name: Option<String>,
 }
 
-pub async fn signup(client: &TsaClient, email: &str, password: &str, name: Option<&str>) -> Result<()> {
+pub async fn signup(
+    client: &TsaClient,
+    email: &str,
+    password: &str,
+    name: Option<&str>,
+) -> Result<()> {
     let req = SignupRequest {
         email: email.to_string(),
         password: password.to_string(),
@@ -41,7 +46,10 @@ pub async fn signup(client: &TsaClient, email: &str, password: &str, name: Optio
     let response: AuthResponse = client.post("/auth/signup", &req).await?;
 
     let mut config = CliConfig::load()?;
-    let ctx_name = config.current_context.clone().unwrap_or_else(|| "default".to_string());
+    let ctx_name = config
+        .current_context
+        .clone()
+        .unwrap_or_else(|| "default".to_string());
     config.set_token(Some(response.token))?;
 
     println!("{}", "Account created successfully!".green().bold());
@@ -65,7 +73,10 @@ pub async fn signin(client: &TsaClient, email: &str, password: &str) -> Result<(
     let response: AuthResponse = client.post("/auth/signin", &req).await?;
 
     let mut config = CliConfig::load()?;
-    let ctx_name = config.current_context.clone().unwrap_or_else(|| "default".to_string());
+    let ctx_name = config
+        .current_context
+        .clone()
+        .unwrap_or_else(|| "default".to_string());
     config.set_token(Some(response.token))?;
 
     println!("{}", "Signed in successfully!".green().bold());
@@ -87,7 +98,10 @@ pub async fn signout(client: &TsaClient) -> Result<()> {
     let _: MessageResponse = client.post("/auth/signout", &serde_json::json!({})).await?;
 
     let mut config = CliConfig::load()?;
-    let ctx_name = config.current_context.clone().unwrap_or_else(|| "default".to_string());
+    let ctx_name = config
+        .current_context
+        .clone()
+        .unwrap_or_else(|| "default".to_string());
     config.set_token(None)?;
 
     println!("{}", "Signed out successfully!".green().bold());
@@ -98,7 +112,10 @@ pub async fn signout(client: &TsaClient) -> Result<()> {
 
 pub async fn status(client: &TsaClient) -> Result<()> {
     let config = CliConfig::load()?;
-    let ctx_name = config.current_context.clone().unwrap_or_else(|| "default".to_string());
+    let ctx_name = config
+        .current_context
+        .clone()
+        .unwrap_or_else(|| "default".to_string());
 
     println!("{}", "Context".blue().bold());
     println!("  {} {}", "Name:".dimmed(), ctx_name.cyan());

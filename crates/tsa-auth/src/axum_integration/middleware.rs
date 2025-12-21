@@ -1,8 +1,4 @@
-use axum::{
-    body::Body,
-    http::Request,
-    response::Response,
-};
+use axum::{body::Body, http::Request, response::Response};
 use axum_extra::extract::CookieJar;
 use std::{
     future::Future,

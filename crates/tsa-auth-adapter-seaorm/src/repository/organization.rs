@@ -44,16 +44,13 @@ impl OrganizationRepository for SeaOrmOrganizationRepository {
             updated_at: Set(organization.updated_at),
         };
 
-        let result = active_model
-            .insert(self.db.as_ref())
-            .await
-            .map_err(|e| {
-                if e.to_string().contains("duplicate") || e.to_string().contains("UNIQUE") {
-                    TsaError::OrganizationAlreadyExists
-                } else {
-                    TsaError::Database(e.to_string())
-                }
-            })?;
+        let result = active_model.insert(self.db.as_ref()).await.map_err(|e| {
+            if e.to_string().contains("duplicate") || e.to_string().contains("UNIQUE") {
+                TsaError::OrganizationAlreadyExists
+            } else {
+                TsaError::Database(e.to_string())
+            }
+        })?;
 
         Ok(result.into())
     }

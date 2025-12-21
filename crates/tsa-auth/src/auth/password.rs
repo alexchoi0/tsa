@@ -1,8 +1,7 @@
 use chrono::Utc;
 use tsa_auth_core::{
-    Adapter, Result, SessionRepository, TokenType, TsaError, UserRepository,
-    VerificationToken, VerificationTokenRepository, WebhookData, WebhookEvent, UserWebhookData,
-    AccountRepository,
+    AccountRepository, Adapter, Result, SessionRepository, TokenType, TsaError, UserRepository,
+    UserWebhookData, VerificationToken, VerificationTokenRepository, WebhookData, WebhookEvent,
 };
 use tsa_auth_token::OpaqueToken;
 use uuid::Uuid;

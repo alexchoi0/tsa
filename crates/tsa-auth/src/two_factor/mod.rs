@@ -1,10 +1,10 @@
+mod backup_codes;
 #[cfg(feature = "totp")]
 mod totp;
-mod backup_codes;
 
+pub use backup_codes::*;
 #[cfg(feature = "totp")]
 pub use totp::*;
-pub use backup_codes::*;
 
 use serde::{Deserialize, Serialize};
 

@@ -4,8 +4,11 @@ use gcloud_sdk::{GoogleApi, GoogleAuthMiddleware};
 use tsa_auth_core::{Result, SchemaManager, TsaError};
 
 pub struct BigtableSchemaManager {
+    #[allow(dead_code)]
     client: GoogleApi<GrpcBigtableClient<GoogleAuthMiddleware>>,
+    #[allow(dead_code)]
     project_id: String,
+    #[allow(dead_code)]
     instance_id: String,
 }
 

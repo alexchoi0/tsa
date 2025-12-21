@@ -34,19 +34,34 @@ impl DynamoDbAdapter {
             users: DynamoDbUserRepository::new(client.clone(), table_prefix),
             sessions: DynamoDbSessionRepository::new(client.clone(), table_prefix),
             accounts: DynamoDbAccountRepository::new(client.clone(), table_prefix),
-            verification_tokens: DynamoDbVerificationTokenRepository::new(client.clone(), table_prefix),
+            verification_tokens: DynamoDbVerificationTokenRepository::new(
+                client.clone(),
+                table_prefix,
+            ),
             two_factor: DynamoDbTwoFactorRepository::new(client.clone(), table_prefix),
             organizations: DynamoDbOrganizationRepository::new(client.clone(), table_prefix),
-            organization_members: DynamoDbOrganizationMemberRepository::new(client.clone(), table_prefix),
-            organization_invitations: DynamoDbOrganizationInvitationRepository::new(client.clone(), table_prefix),
+            organization_members: DynamoDbOrganizationMemberRepository::new(
+                client.clone(),
+                table_prefix,
+            ),
+            organization_invitations: DynamoDbOrganizationInvitationRepository::new(
+                client.clone(),
+                table_prefix,
+            ),
             api_keys: DynamoDbApiKeyRepository::new(client.clone(), table_prefix),
             passkeys: DynamoDbPasskeyRepository::new(client.clone(), table_prefix),
-            passkey_challenges: DynamoDbPasskeyChallengeRepository::new(client.clone(), table_prefix),
+            passkey_challenges: DynamoDbPasskeyChallengeRepository::new(
+                client.clone(),
+                table_prefix,
+            ),
             audit_logs: DynamoDbAuditLogRepository::new(client.clone(), table_prefix),
             account_lockouts: DynamoDbAccountLockoutRepository::new(client.clone(), table_prefix),
             password_history: DynamoDbPasswordHistoryRepository::new(client.clone(), table_prefix),
             ip_rules: DynamoDbIpRuleRepository::new(client.clone(), table_prefix),
-            impersonation_sessions: DynamoDbImpersonationSessionRepository::new(client, table_prefix),
+            impersonation_sessions: DynamoDbImpersonationSessionRepository::new(
+                client,
+                table_prefix,
+            ),
         }
     }
 }

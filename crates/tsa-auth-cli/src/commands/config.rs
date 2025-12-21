@@ -28,7 +28,10 @@ pub fn get_contexts() -> Result<()> {
     if config.contexts.is_empty() {
         println!("{}", "No contexts configured".yellow());
         println!();
-        println!("Create one with: {} set-context <name> --server <url>", "tsa config".dimmed());
+        println!(
+            "Create one with: {} set-context <name> --server <url>",
+            "tsa config".dimmed()
+        );
         return Ok(());
     }
 
@@ -49,7 +52,11 @@ pub fn get_contexts() -> Result<()> {
         println!(
             "    {} {}",
             "token:".dimmed(),
-            if ctx.token.is_some() { "(set)".green().to_string() } else { "(not set)".yellow().to_string() }
+            if ctx.token.is_some() {
+                "(set)".green().to_string()
+            } else {
+                "(not set)".yellow().to_string()
+            }
         );
     }
 
@@ -80,7 +87,12 @@ pub fn rename_context(old_name: &str, new_name: &str) -> Result<()> {
     let mut config = CliConfig::load()?;
     config.rename_context(old_name, new_name)?;
 
-    println!("{} Context '{}' renamed to '{}'", "✓".green(), old_name, new_name.cyan());
+    println!(
+        "{} Context '{}' renamed to '{}'",
+        "✓".green(),
+        old_name,
+        new_name.cyan()
+    );
 
     Ok(())
 }
@@ -144,12 +156,12 @@ pub fn init() -> Result<()> {
 
     println!("{}", "Configuration initialized!".green().bold());
     println!();
-    println!(
-        "  Config file: {}",
-        CliConfig::config_path().display()
-    );
+    println!("  Config file: {}", CliConfig::config_path().display());
     println!();
-    println!("  Run {} to add more contexts", "tsa config set-context".cyan());
+    println!(
+        "  Run {} to add more contexts",
+        "tsa config set-context".cyan()
+    );
 
     Ok(())
 }

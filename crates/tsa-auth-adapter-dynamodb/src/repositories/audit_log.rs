@@ -26,7 +26,7 @@ impl DynamoDbAuditLogRepository {
     }
 
     fn to_item(log: &AuditLog) -> HashMap<String, AttributeValue> {
-        let action_str = serde_json::to_value(&log.action)
+        let action_str = serde_json::to_value(log.action)
             .ok()
             .and_then(|v| v.as_str().map(String::from))
             .unwrap_or_else(|| "other".to_string());
@@ -34,10 +34,16 @@ impl DynamoDbAuditLogRepository {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(log.id.to_string()));
         if let Some(user_id) = log.user_id {
-            item.insert("user_id".to_string(), AttributeValue::S(user_id.to_string()));
+            item.insert(
+                "user_id".to_string(),
+                AttributeValue::S(user_id.to_string()),
+            );
         }
         if let Some(actor_id) = log.actor_id {
-            item.insert("actor_id".to_string(), AttributeValue::S(actor_id.to_string()));
+            item.insert(
+                "actor_id".to_string(),
+                AttributeValue::S(actor_id.to_string()),
+            );
         }
         item.insert("action".to_string(), AttributeValue::S(action_str));
         if let Some(ref ip) = log.ip_address {
@@ -53,13 +59,19 @@ impl DynamoDbAuditLogRepository {
             item.insert("resource_id".to_string(), AttributeValue::S(ri.clone()));
         }
         if let Some(ref details) = log.details {
-            item.insert("details".to_string(), AttributeValue::S(details.to_string()));
+            item.insert(
+                "details".to_string(),
+                AttributeValue::S(details.to_string()),
+            );
         }
         item.insert("success".to_string(), AttributeValue::Bool(log.success));
         if let Some(ref err) = log.error_message {
             item.insert("error_message".to_string(), AttributeValue::S(err.clone()));
         }
-        item.insert("created_at".to_string(), AttributeValue::S(log.created_at.to_rfc3339()));
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(log.created_at.to_rfc3339()),
+        );
         item
     }
 
@@ -68,8 +80,7 @@ impl DynamoDbAuditLogRepository {
         let action: AuditAction = serde_json::from_value(serde_json::json!(action_str))
             .unwrap_or(AuditAction::SigninFailed);
 
-        let details = get_string_opt(item, "details")
-            .and_then(|s| serde_json::from_str(&s).ok());
+        let details = get_string_opt(item, "details").and_then(|s| serde_json::from_str(&s).ok());
 
         Ok(AuditLog {
             id: get_uuid(item, "id")?,
@@ -145,7 +156,7 @@ impl AuditLogRepository for DynamoDbAuditLogRepository {
         limit: u32,
         _offset: u32,
     ) -> Result<Vec<AuditLog>> {
-        let action_str = serde_json::to_value(&action)
+        let action_str = serde_json::to_value(action)
             .ok()
             .and_then(|v| v.as_str().map(String::from))
             .unwrap_or_else(|| "other".to_string());
@@ -171,7 +182,12 @@ impl AuditLogRepository for DynamoDbAuditLogRepository {
             .collect()
     }
 
-    async fn find_by_ip(&self, ip_address: &str, limit: u32, _offset: u32) -> Result<Vec<AuditLog>> {
+    async fn find_by_ip(
+        &self,
+        ip_address: &str,
+        limit: u32,
+        _offset: u32,
+    ) -> Result<Vec<AuditLog>> {
         let result = self
             .client
             .query()

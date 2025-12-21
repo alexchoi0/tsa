@@ -1,11 +1,11 @@
 use chrono::Utc;
 use tsa_auth_core::{
-    Adapter, Result, TsaError, TwoFactor, TwoFactorRepository, UserRepository, WebhookData,
-    WebhookEvent, UserWebhookData,
+    Adapter, Result, TsaError, TwoFactor, TwoFactorRepository, UserRepository, UserWebhookData,
+    WebhookData, WebhookEvent,
 };
 use uuid::Uuid;
 
-use crate::two_factor::{BackupCodes, TwoFactorMethod, TwoFactorSetup, TotpManager};
+use crate::two_factor::{BackupCodes, TotpManager, TwoFactorMethod, TwoFactorSetup};
 use crate::webhook::WebhookSender;
 use crate::AuthCallbacks;
 

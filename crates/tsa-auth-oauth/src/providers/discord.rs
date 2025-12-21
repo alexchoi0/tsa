@@ -48,7 +48,10 @@ struct DiscordUser {
 impl DiscordUser {
     fn avatar_url(&self) -> Option<String> {
         self.avatar.as_ref().map(|hash| {
-            format!("https://cdn.discordapp.com/avatars/{}/{}.png", self.id, hash)
+            format!(
+                "https://cdn.discordapp.com/avatars/{}/{}.png",
+                self.id, hash
+            )
         })
     }
 }

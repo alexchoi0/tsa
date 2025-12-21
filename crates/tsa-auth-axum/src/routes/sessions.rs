@@ -27,7 +27,9 @@ pub async fn revoke_session(
     let sessions = state.auth.get_user_sessions(auth.user.id).await?;
 
     if !sessions.iter().any(|s| s.id == session_id) {
-        return Err(ApiError::unauthorized("Session not found or does not belong to you"));
+        return Err(ApiError::unauthorized(
+            "Session not found or does not belong to you",
+        ));
     }
 
     state.auth.revoke_session(session_id).await?;

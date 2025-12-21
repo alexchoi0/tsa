@@ -33,7 +33,7 @@ impl From<crate::entity::audit_log::Model> for AuditLog {
             user_agent: model.user_agent,
             resource_type: model.resource_type,
             resource_id: model.resource_id,
-            details: model.details.map(|j| serde_json::Value::from(j)),
+            details: model.details,
             success: model.success,
             error_message: model.error_message,
             created_at: model.created_at,
@@ -45,7 +45,7 @@ impl From<crate::entity::audit_log::Model> for AuditLog {
 impl AuditLogRepository for SeaOrmAuditLogRepository {
     async fn create(&self, log: &AuditLog) -> Result<AuditLog> {
         let action_str =
-            serde_json::to_value(&log.action).map_err(|e| TsaError::Internal(e.to_string()))?;
+            serde_json::to_value(log.action).map_err(|e| TsaError::Internal(e.to_string()))?;
         let action_str = action_str.as_str().unwrap_or("other").to_string();
 
         let active_model = ActiveModel {
@@ -57,7 +57,7 @@ impl AuditLogRepository for SeaOrmAuditLogRepository {
             user_agent: Set(log.user_agent.clone()),
             resource_type: Set(log.resource_type.clone()),
             resource_id: Set(log.resource_id.clone()),
-            details: Set(log.details.clone().map(sea_orm::JsonValue::from)),
+            details: Set(log.details.clone()),
             success: Set(log.success),
             error_message: Set(log.error_message.clone()),
             created_at: Set(log.created_at),
@@ -100,7 +100,7 @@ impl AuditLogRepository for SeaOrmAuditLogRepository {
         offset: u32,
     ) -> Result<Vec<AuditLog>> {
         let action_str =
-            serde_json::to_value(&action).map_err(|e| TsaError::Internal(e.to_string()))?;
+            serde_json::to_value(action).map_err(|e| TsaError::Internal(e.to_string()))?;
         let action_str = action_str.as_str().unwrap_or("other").to_string();
 
         let results = Entity::find()

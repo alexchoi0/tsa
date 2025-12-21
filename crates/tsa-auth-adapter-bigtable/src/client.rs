@@ -1,6 +1,6 @@
 use gcloud_sdk::google::bigtable::v2::{
-    bigtable_client::BigtableClient as GrpcBigtableClient, mutation, row_range,
-    MutateRowRequest, Mutation, ReadRowsRequest, RowRange, RowSet,
+    bigtable_client::BigtableClient as GrpcBigtableClient, mutation, row_range, MutateRowRequest,
+    Mutation, ReadRowsRequest, RowRange, RowSet,
 };
 use gcloud_sdk::{GoogleApi, GoogleAuthMiddleware};
 use serde::{de::DeserializeOwned, Serialize};

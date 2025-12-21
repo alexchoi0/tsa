@@ -67,7 +67,8 @@ impl DynamoDbSchemaManager {
         gsi_keys: Vec<&str>,
         ttl_attribute: Option<&str>,
     ) -> Result<()> {
-        let mut attr_defs: Vec<AttributeDefinition> = vec![Self::attr_def("id", ScalarAttributeType::S)];
+        let mut attr_defs: Vec<AttributeDefinition> =
+            vec![Self::attr_def("id", ScalarAttributeType::S)];
         for (name, attr_type) in &attributes {
             attr_defs.push(Self::attr_def(name, attr_type.clone()));
         }

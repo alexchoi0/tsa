@@ -85,9 +85,7 @@ impl ImpersonationSessionRepository for MongoDbImpersonationSessionRepository {
             .await
             .map_err(|e| TsaError::Database(e.to_string()))?;
 
-        self.find_by_id(id)
-            .await?
-            .ok_or(TsaError::SessionNotFound)
+        self.find_by_id(id).await?.ok_or(TsaError::SessionNotFound)
     }
 
     async fn delete(&self, id: Uuid) -> Result<()> {

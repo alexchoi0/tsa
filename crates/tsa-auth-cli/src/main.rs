@@ -1,8 +1,8 @@
 use clap::{Parser, Subcommand};
 
+mod client;
 mod commands;
 mod config;
-mod client;
 
 #[derive(Parser)]
 #[command(name = "tsa")]
@@ -297,7 +297,11 @@ async fn main() -> anyhow::Result<()> {
         Commands::Auth { command } => {
             let client = client::TsaClient::new(server_url, token);
             match command {
-                AuthCommands::Signup { email, password, name } => {
+                AuthCommands::Signup {
+                    email,
+                    password,
+                    name,
+                } => {
                     commands::auth::signup(&client, &email, &password, name.as_deref()).await?;
                 }
                 AuthCommands::Signin { email, password } => {
@@ -346,10 +350,18 @@ async fn main() -> anyhow::Result<()> {
                 OrgCommands::Members { id } => {
                     commands::org::members(&client, &id).await?;
                 }
-                OrgCommands::AddMember { org_id, user_id, role } => {
+                OrgCommands::AddMember {
+                    org_id,
+                    user_id,
+                    role,
+                } => {
                     commands::org::add_member(&client, &org_id, &user_id, &role).await?;
                 }
-                OrgCommands::UpdateMember { org_id, user_id, role } => {
+                OrgCommands::UpdateMember {
+                    org_id,
+                    user_id,
+                    role,
+                } => {
                     commands::org::update_member(&client, &org_id, &user_id, &role).await?;
                 }
                 OrgCommands::RemoveMember { org_id, user_id } => {
@@ -377,7 +389,11 @@ async fn main() -> anyhow::Result<()> {
                 ApiKeyCommands::List => {
                     commands::apikey::list(&client).await?;
                 }
-                ApiKeyCommands::Create { name, scopes, expires_days } => {
+                ApiKeyCommands::Create {
+                    name,
+                    scopes,
+                    expires_days,
+                } => {
                     commands::apikey::create(&client, &name, scopes, expires_days).await?;
                 }
                 ApiKeyCommands::Update { id, name, scopes } => {
@@ -388,37 +404,35 @@ async fn main() -> anyhow::Result<()> {
                 }
             }
         }
-        Commands::Config { command } => {
-            match command {
-                ConfigCommands::SetContext { name, server } => {
-                    commands::config::set_context(&name, &server)?;
-                }
-                ConfigCommands::UseContext { name } => {
-                    commands::config::use_context(&name)?;
-                }
-                ConfigCommands::GetContexts => {
-                    commands::config::get_contexts()?;
-                }
-                ConfigCommands::CurrentContext => {
-                    commands::config::current_context()?;
-                }
-                ConfigCommands::DeleteContext { name } => {
-                    commands::config::delete_context(&name)?;
-                }
-                ConfigCommands::RenameContext { old_name, new_name } => {
-                    commands::config::rename_context(&old_name, &new_name)?;
-                }
-                ConfigCommands::SetToken { token } => {
-                    commands::config::set_token(&token)?;
-                }
-                ConfigCommands::Show => {
-                    commands::config::show()?;
-                }
-                ConfigCommands::Init => {
-                    commands::config::init()?;
-                }
+        Commands::Config { command } => match command {
+            ConfigCommands::SetContext { name, server } => {
+                commands::config::set_context(&name, &server)?;
             }
-        }
+            ConfigCommands::UseContext { name } => {
+                commands::config::use_context(&name)?;
+            }
+            ConfigCommands::GetContexts => {
+                commands::config::get_contexts()?;
+            }
+            ConfigCommands::CurrentContext => {
+                commands::config::current_context()?;
+            }
+            ConfigCommands::DeleteContext { name } => {
+                commands::config::delete_context(&name)?;
+            }
+            ConfigCommands::RenameContext { old_name, new_name } => {
+                commands::config::rename_context(&old_name, &new_name)?;
+            }
+            ConfigCommands::SetToken { token } => {
+                commands::config::set_token(&token)?;
+            }
+            ConfigCommands::Show => {
+                commands::config::show()?;
+            }
+            ConfigCommands::Init => {
+                commands::config::init()?;
+            }
+        },
         Commands::Health => {
             let client = client::TsaClient::new(server_url, None);
             commands::health::check(&client).await?;

@@ -1,7 +1,7 @@
 use chrono::Utc;
 use tsa_auth_core::{
-    Adapter, ApiKey, ApiKeyRepository, OrganizationRole, Result, TsaError, User, UserRepository,
-    WebhookData, WebhookEvent, ApiKeyWebhookData,
+    Adapter, ApiKey, ApiKeyRepository, ApiKeyWebhookData, OrganizationRole, Result, TsaError, User,
+    UserRepository, WebhookData, WebhookEvent,
 };
 use tsa_auth_token::OpaqueToken;
 use uuid::Uuid;

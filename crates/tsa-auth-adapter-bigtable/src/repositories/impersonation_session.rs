@@ -37,8 +37,13 @@ impl ImpersonationSessionRepository for BigtableImpersonationSessionRepository {
     }
 
     async fn find_active_by_admin(&self, admin_id: Uuid) -> Result<Vec<ImpersonationSession>> {
-        let sessions = self.client
-            .find_all_by_field::<ImpersonationSession>(ENTITY_TYPE, "admin_id", &admin_id.to_string())
+        let sessions = self
+            .client
+            .find_all_by_field::<ImpersonationSession>(
+                ENTITY_TYPE,
+                "admin_id",
+                &admin_id.to_string(),
+            )
             .await?;
         Ok(sessions
             .into_iter()

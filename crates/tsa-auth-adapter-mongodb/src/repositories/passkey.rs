@@ -69,16 +69,13 @@ impl MongoDbPasskeyRepository {
 impl PasskeyRepository for MongoDbPasskeyRepository {
     async fn create(&self, passkey: &Passkey) -> Result<Passkey> {
         let doc = PasskeyDocument::from(passkey);
-        self.collection
-            .insert_one(&doc)
-            .await
-            .map_err(|e| {
-                if e.to_string().contains("duplicate key") {
-                    TsaError::PasskeyAlreadyRegistered
-                } else {
-                    TsaError::Database(e.to_string())
-                }
-            })?;
+        self.collection.insert_one(&doc).await.map_err(|e| {
+            if e.to_string().contains("duplicate key") {
+                TsaError::PasskeyAlreadyRegistered
+            } else {
+                TsaError::Database(e.to_string())
+            }
+        })?;
         Ok(passkey.clone())
     }
 

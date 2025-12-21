@@ -24,8 +24,14 @@ impl MicrosoftProvider {
         let client = create_oauth_client(
             client_id,
             client_secret,
-            &format!("https://login.microsoftonline.com/{}/oauth2/v2.0/authorize", tenant),
-            &format!("https://login.microsoftonline.com/{}/oauth2/v2.0/token", tenant),
+            &format!(
+                "https://login.microsoftonline.com/{}/oauth2/v2.0/authorize",
+                tenant
+            ),
+            &format!(
+                "https://login.microsoftonline.com/{}/oauth2/v2.0/token",
+                tenant
+            ),
             redirect_url,
         )?;
 

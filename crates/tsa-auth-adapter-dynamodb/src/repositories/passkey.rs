@@ -29,18 +29,39 @@ impl DynamoDbPasskeyRepository {
     fn to_item(passkey: &Passkey) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
         item.insert("id".to_string(), AttributeValue::S(passkey.id.to_string()));
-        item.insert("user_id".to_string(), AttributeValue::S(passkey.user_id.to_string()));
-        item.insert("credential_id".to_string(), AttributeValue::B(passkey.credential_id.clone().into()));
-        item.insert("credential_id_b64".to_string(), AttributeValue::S(STANDARD.encode(&passkey.credential_id)));
-        item.insert("public_key".to_string(), AttributeValue::B(passkey.public_key.clone().into()));
-        item.insert("counter".to_string(), AttributeValue::N(passkey.counter.to_string()));
+        item.insert(
+            "user_id".to_string(),
+            AttributeValue::S(passkey.user_id.to_string()),
+        );
+        item.insert(
+            "credential_id".to_string(),
+            AttributeValue::B(passkey.credential_id.clone().into()),
+        );
+        item.insert(
+            "credential_id_b64".to_string(),
+            AttributeValue::S(STANDARD.encode(&passkey.credential_id)),
+        );
+        item.insert(
+            "public_key".to_string(),
+            AttributeValue::B(passkey.public_key.clone().into()),
+        );
+        item.insert(
+            "counter".to_string(),
+            AttributeValue::N(passkey.counter.to_string()),
+        );
         item.insert("name".to_string(), AttributeValue::S(passkey.name.clone()));
         if let Some(ref transports) = passkey.transports {
             item.insert("transports".to_string(), string_vec_to_attr(transports));
         }
-        item.insert("created_at".to_string(), AttributeValue::S(passkey.created_at.to_rfc3339()));
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(passkey.created_at.to_rfc3339()),
+        );
         if let Some(ref last_used) = passkey.last_used_at {
-            item.insert("last_used_at".to_string(), AttributeValue::S(last_used.to_rfc3339()));
+            item.insert(
+                "last_used_at".to_string(),
+                AttributeValue::S(last_used.to_rfc3339()),
+            );
         }
         item
     }

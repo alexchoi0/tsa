@@ -101,9 +101,7 @@ impl<A: Adapter, C: AuthCallbacks, W: WebhookSender> Auth<A, C, W> {
             .create(&verification)
             .await?;
 
-        self.callbacks
-            .send_verification_email(user, &token)
-            .await?;
+        self.callbacks.send_verification_email(user, &token).await?;
 
         Ok(())
     }
@@ -141,8 +139,7 @@ impl<A: Adapter, C: AuthCallbacks, W: WebhookSender> Auth<A, C, W> {
         password_hash: &str,
     ) -> Result<()> {
         let accounts = self.adapter.accounts().find_by_user_id(user_id).await?;
-        if let Some(credential_account) =
-            accounts.into_iter().find(|a| a.provider == "credential")
+        if let Some(credential_account) = accounts.into_iter().find(|a| a.provider == "credential")
         {
             let updated = Account {
                 access_token: Some(password_hash.to_string()),

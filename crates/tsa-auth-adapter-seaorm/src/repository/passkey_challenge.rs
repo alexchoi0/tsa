@@ -1,10 +1,10 @@
 use async_trait::async_trait;
 use chrono::Utc;
-use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set,
-};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
 use std::sync::Arc;
-use tsa_auth_core::{PasskeyChallenge, PasskeyChallengeRepository, PasskeyChallengeType, Result, TsaError};
+use tsa_auth_core::{
+    PasskeyChallenge, PasskeyChallengeRepository, PasskeyChallengeType, Result, TsaError,
+};
 use uuid::Uuid;
 
 use crate::entity::passkey_challenge::{ActiveModel, Column, Entity};

@@ -2,7 +2,9 @@ use async_trait::async_trait;
 use chrono::Utc;
 use mongodb::{bson::doc, Collection};
 use serde::{Deserialize, Serialize};
-use tsa_auth_core::{PasskeyChallenge, PasskeyChallengeRepository, PasskeyChallengeType, Result, TsaError};
+use tsa_auth_core::{
+    PasskeyChallenge, PasskeyChallengeRepository, PasskeyChallengeType, Result, TsaError,
+};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

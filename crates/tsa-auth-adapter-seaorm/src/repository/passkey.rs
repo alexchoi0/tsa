@@ -1,7 +1,5 @@
 use async_trait::async_trait;
-use sea_orm::{
-    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set,
-};
+use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set};
 use std::sync::Arc;
 use tsa_auth_core::{Passkey, PasskeyRepository, Result, TsaError};
 use uuid::Uuid;
@@ -28,9 +26,9 @@ impl From<crate::entity::passkey::Model> for Passkey {
             public_key: model.public_key,
             counter: model.counter as u32,
             name: model.name,
-            transports: model.transports.map(|t| {
-                serde_json::from_str(&t).unwrap_or_default()
-            }),
+            transports: model
+                .transports
+                .map(|t| serde_json::from_str(&t).unwrap_or_default()),
             created_at: model.created_at,
             last_used_at: model.last_used_at,
         }
@@ -57,16 +55,13 @@ impl PasskeyRepository for SeaOrmPasskeyRepository {
             last_used_at: Set(passkey.last_used_at),
         };
 
-        let result = active_model
-            .insert(self.db.as_ref())
-            .await
-            .map_err(|e| {
-                if e.to_string().contains("duplicate") || e.to_string().contains("UNIQUE") {
-                    TsaError::PasskeyAlreadyRegistered
-                } else {
-                    TsaError::Database(e.to_string())
-                }
-            })?;
+        let result = active_model.insert(self.db.as_ref()).await.map_err(|e| {
+            if e.to_string().contains("duplicate") || e.to_string().contains("UNIQUE") {
+                TsaError::PasskeyAlreadyRegistered
+            } else {
+                TsaError::Database(e.to_string())
+            }
+        })?;
 
         Ok(result.into())
     }

@@ -18,16 +18,13 @@ impl MongoDbAccountRepository {
 #[async_trait]
 impl AccountRepository for MongoDbAccountRepository {
     async fn create(&self, account: &Account) -> Result<Account> {
-        self.collection
-            .insert_one(account)
-            .await
-            .map_err(|e| {
-                if e.to_string().contains("duplicate key") {
-                    TsaError::AccountAlreadyLinked
-                } else {
-                    TsaError::Database(e.to_string())
-                }
-            })?;
+        self.collection.insert_one(account).await.map_err(|e| {
+            if e.to_string().contains("duplicate key") {
+                TsaError::AccountAlreadyLinked
+            } else {
+                TsaError::Database(e.to_string())
+            }
+        })?;
         Ok(account.clone())
     }
 

@@ -1,10 +1,9 @@
 use crate::client::BigtableClient;
 use crate::repositories::{
     BigtableAccountLockoutRepository, BigtableAccountRepository, BigtableApiKeyRepository,
-    BigtableAuditLogRepository, BigtableImpersonationSessionRepository,
-    BigtableIpRuleRepository, BigtableOrganizationInvitationRepository,
-    BigtableOrganizationMemberRepository, BigtableOrganizationRepository,
-    BigtablePasskeyChallengeRepository, BigtablePasskeyRepository,
+    BigtableAuditLogRepository, BigtableImpersonationSessionRepository, BigtableIpRuleRepository,
+    BigtableOrganizationInvitationRepository, BigtableOrganizationMemberRepository,
+    BigtableOrganizationRepository, BigtablePasskeyChallengeRepository, BigtablePasskeyRepository,
     BigtablePasswordHistoryRepository, BigtableSessionRepository, BigtableTwoFactorRepository,
     BigtableUserRepository, BigtableVerificationTokenRepository,
 };

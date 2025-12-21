@@ -44,7 +44,12 @@ pub async fn signin(
 ) -> Result<Json<AuthResponse>, ApiError> {
     let (user, session, token) = state
         .auth
-        .signin(&req.email, &req.password, client.ip_address, client.user_agent)
+        .signin(
+            &req.email,
+            &req.password,
+            client.ip_address,
+            client.user_agent,
+        )
         .await?;
 
     Ok(Json(AuthResponse {
@@ -99,7 +104,9 @@ pub async fn verify_2fa(
     Json(req): Json<Verify2faRequest>,
 ) -> Result<Json<MessageResponse>, ApiError> {
     state.auth.verify_2fa(auth.user.id, &req.code).await?;
-    Ok(Json(MessageResponse::new("Two-factor authentication enabled")))
+    Ok(Json(MessageResponse::new(
+        "Two-factor authentication enabled",
+    )))
 }
 
 #[derive(Deserialize)]
@@ -113,7 +120,9 @@ pub async fn disable_2fa(
     Json(req): Json<Disable2faRequest>,
 ) -> Result<Json<MessageResponse>, ApiError> {
     state.auth.disable_2fa(auth.user.id, &req.code).await?;
-    Ok(Json(MessageResponse::new("Two-factor authentication disabled")))
+    Ok(Json(MessageResponse::new(
+        "Two-factor authentication disabled",
+    )))
 }
 
 #[derive(Deserialize)]

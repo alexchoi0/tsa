@@ -34,16 +34,24 @@ impl DynamoDbOrganizationRepository {
             item.insert("logo".to_string(), AttributeValue::S(logo.clone()));
         }
         if let Some(ref metadata) = org.metadata {
-            item.insert("metadata".to_string(), AttributeValue::S(metadata.to_string()));
+            item.insert(
+                "metadata".to_string(),
+                AttributeValue::S(metadata.to_string()),
+            );
         }
-        item.insert("created_at".to_string(), AttributeValue::S(org.created_at.to_rfc3339()));
-        item.insert("updated_at".to_string(), AttributeValue::S(org.updated_at.to_rfc3339()));
+        item.insert(
+            "created_at".to_string(),
+            AttributeValue::S(org.created_at.to_rfc3339()),
+        );
+        item.insert(
+            "updated_at".to_string(),
+            AttributeValue::S(org.updated_at.to_rfc3339()),
+        );
         item
     }
 
     fn from_item(item: &HashMap<String, AttributeValue>) -> Result<Organization> {
-        let metadata = get_string_opt(item, "metadata")
-            .and_then(|s| serde_json::from_str(&s).ok());
+        let metadata = get_string_opt(item, "metadata").and_then(|s| serde_json::from_str(&s).ok());
 
         Ok(Organization {
             id: get_uuid(item, "id")?,

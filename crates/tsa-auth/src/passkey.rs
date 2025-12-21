@@ -97,8 +97,8 @@ impl<A: Adapter, C: AuthCallbacks> crate::Auth<A, C> {
             )
             .map_err(|e| TsaError::Internal(e.to_string()))?;
 
-        let state_bytes = serde_json::to_vec(&reg_state)
-            .map_err(|e| TsaError::Internal(e.to_string()))?;
+        let state_bytes =
+            serde_json::to_vec(&reg_state).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let challenge_bytes: Vec<u8> = ccr.public_key.challenge.as_ref().to_vec();
 
@@ -136,7 +136,10 @@ impl<A: Adapter, C: AuthCallbacks> crate::Auth<A, C> {
             .ok_or(TsaError::PasskeyChallengeNotFound)?;
 
         if challenge.expires_at < Utc::now() {
-            self.adapter.passkey_challenges().delete(challenge_id).await?;
+            self.adapter
+                .passkey_challenges()
+                .delete(challenge_id)
+                .await?;
             return Err(TsaError::PasskeyChallengeExpired);
         }
 
@@ -154,7 +157,10 @@ impl<A: Adapter, C: AuthCallbacks> crate::Auth<A, C> {
             .finish_passkey_registration(&response, &reg_state)
             .map_err(|_| TsaError::PasskeyVerificationFailed)?;
 
-        self.adapter.passkey_challenges().delete(challenge_id).await?;
+        self.adapter
+            .passkey_challenges()
+            .delete(challenge_id)
+            .await?;
 
         let now = Utc::now();
         let passkey = Passkey {
@@ -205,8 +211,8 @@ impl<A: Adapter, C: AuthCallbacks> crate::Auth<A, C> {
             .start_passkey_authentication(&credentials)
             .map_err(|e| TsaError::Internal(e.to_string()))?;
 
-        let state_bytes = serde_json::to_vec(&auth_state)
-            .map_err(|e| TsaError::Internal(e.to_string()))?;
+        let state_bytes =
+            serde_json::to_vec(&auth_state).map_err(|e| TsaError::Internal(e.to_string()))?;
 
         let challenge_bytes: Vec<u8> = rcr.public_key.challenge.as_ref().to_vec();
 
@@ -245,7 +251,10 @@ impl<A: Adapter, C: AuthCallbacks> crate::Auth<A, C> {
             .ok_or(TsaError::PasskeyChallengeNotFound)?;
 
         if challenge.expires_at < Utc::now() {
-            self.adapter.passkey_challenges().delete(challenge_id).await?;
+            self.adapter
+                .passkey_challenges()
+                .delete(challenge_id)
+                .await?;
             return Err(TsaError::PasskeyChallengeExpired);
         }
 
@@ -263,7 +272,10 @@ impl<A: Adapter, C: AuthCallbacks> crate::Auth<A, C> {
             .finish_passkey_authentication(&response, &auth_state)
             .map_err(|_| TsaError::PasskeyVerificationFailed)?;
 
-        self.adapter.passkey_challenges().delete(challenge_id).await?;
+        self.adapter
+            .passkey_challenges()
+            .delete(challenge_id)
+            .await?;
 
         let credential_id_bytes = response.id.as_ref();
         if let Some(mut passkey) = self
@@ -284,7 +296,9 @@ impl<A: Adapter, C: AuthCallbacks> crate::Auth<A, C> {
             .await?
             .ok_or(TsaError::UserNotFound)?;
 
-        let (session, token) = self.create_session_internal(&user, ip_address, user_agent).await?;
+        let (session, token) = self
+            .create_session_internal(&user, ip_address, user_agent)
+            .await?;
 
         Ok((user, session, token))
     }

@@ -18,10 +18,16 @@ impl MigrationTrait for Migration {
                     .col(uuid(ImpersonationSessions::AdminId).not_null())
                     .col(uuid(ImpersonationSessions::TargetUserId).not_null())
                     .col(uuid(ImpersonationSessions::OriginalSessionId).not_null())
-                    .col(uuid(ImpersonationSessions::ImpersonationSessionId).unique_key().not_null())
+                    .col(
+                        uuid(ImpersonationSessions::ImpersonationSessionId)
+                            .unique_key()
+                            .not_null(),
+                    )
                     .col(string_null(ImpersonationSessions::Reason))
                     .col(timestamp_with_time_zone(ImpersonationSessions::StartedAt).not_null())
-                    .col(timestamp_with_time_zone_null(ImpersonationSessions::EndedAt))
+                    .col(timestamp_with_time_zone_null(
+                        ImpersonationSessions::EndedAt,
+                    ))
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_imp_sessions_admin")
@@ -32,21 +38,30 @@ impl MigrationTrait for Migration {
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_imp_sessions_target")
-                            .from(ImpersonationSessions::Table, ImpersonationSessions::TargetUserId)
+                            .from(
+                                ImpersonationSessions::Table,
+                                ImpersonationSessions::TargetUserId,
+                            )
                             .to(Users::Table, Users::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_imp_sessions_orig")
-                            .from(ImpersonationSessions::Table, ImpersonationSessions::OriginalSessionId)
+                            .from(
+                                ImpersonationSessions::Table,
+                                ImpersonationSessions::OriginalSessionId,
+                            )
                             .to(Sessions::Table, Sessions::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_imp_sessions_imp")
-                            .from(ImpersonationSessions::Table, ImpersonationSessions::ImpersonationSessionId)
+                            .from(
+                                ImpersonationSessions::Table,
+                                ImpersonationSessions::ImpersonationSessionId,
+                            )
                             .to(Sessions::Table, Sessions::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
