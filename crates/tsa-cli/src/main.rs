@@ -17,15 +17,6 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    #[command(about = "Start the TSA server")]
-    Server {
-        #[arg(short, long, default_value = "3000", env = "TSA_PORT")]
-        port: u16,
-
-        #[arg(short = 'H', long, default_value = "0.0.0.0", env = "TSA_HOST")]
-        host: String,
-    },
-
     #[command(about = "Authentication commands")]
     Auth {
         #[command(subcommand)]
@@ -134,6 +125,16 @@ enum OrgCommands {
         slug: String,
     },
 
+    #[command(about = "Update an organization")]
+    Update {
+        #[arg(help = "Organization ID")]
+        id: String,
+        #[arg(short, long)]
+        name: Option<String>,
+        #[arg(short, long)]
+        logo: Option<String>,
+    },
+
     #[command(about = "Delete an organization")]
     Delete {
         #[arg(help = "Organization ID")]
@@ -153,6 +154,16 @@ enum OrgCommands {
         #[arg(help = "User ID to add")]
         user_id: String,
         #[arg(short, long, default_value = "member")]
+        role: String,
+    },
+
+    #[command(about = "Update a member's role")]
+    UpdateMember {
+        #[arg(help = "Organization ID")]
+        org_id: String,
+        #[arg(help = "User ID to update")]
+        user_id: String,
+        #[arg(short, long)]
         role: String,
     },
 
@@ -193,6 +204,16 @@ enum ApiKeyCommands {
         scopes: Option<Vec<String>>,
         #[arg(short, long)]
         expires_days: Option<i64>,
+    },
+
+    #[command(about = "Update an API key")]
+    Update {
+        #[arg(help = "API key ID")]
+        id: String,
+        #[arg(short, long)]
+        name: Option<String>,
+        #[arg(short, long)]
+        scopes: Option<Vec<String>>,
     },
 
     #[command(about = "Delete an API key")]
@@ -273,9 +294,6 @@ async fn main() -> anyhow::Result<()> {
     let token = cfg.token();
 
     match cli.command {
-        Commands::Server { port, host } => {
-            commands::server::run(host, port).await?;
-        }
         Commands::Auth { command } => {
             let client = client::TsaClient::new(server_url, token);
             match command {
@@ -319,6 +337,9 @@ async fn main() -> anyhow::Result<()> {
                 OrgCommands::Get { slug } => {
                     commands::org::get(&client, &slug).await?;
                 }
+                OrgCommands::Update { id, name, logo } => {
+                    commands::org::update(&client, &id, name.as_deref(), logo.as_deref()).await?;
+                }
                 OrgCommands::Delete { id } => {
                     commands::org::delete(&client, &id).await?;
                 }
@@ -327,6 +348,9 @@ async fn main() -> anyhow::Result<()> {
                 }
                 OrgCommands::AddMember { org_id, user_id, role } => {
                     commands::org::add_member(&client, &org_id, &user_id, &role).await?;
+                }
+                OrgCommands::UpdateMember { org_id, user_id, role } => {
+                    commands::org::update_member(&client, &org_id, &user_id, &role).await?;
                 }
                 OrgCommands::RemoveMember { org_id, user_id } => {
                     commands::org::remove_member(&client, &org_id, &user_id).await?;
@@ -355,6 +379,9 @@ async fn main() -> anyhow::Result<()> {
                 }
                 ApiKeyCommands::Create { name, scopes, expires_days } => {
                     commands::apikey::create(&client, &name, scopes, expires_days).await?;
+                }
+                ApiKeyCommands::Update { id, name, scopes } => {
+                    commands::apikey::update(&client, &id, name, scopes).await?;
                 }
                 ApiKeyCommands::Delete { id } => {
                     commands::apikey::delete(&client, &id).await?;

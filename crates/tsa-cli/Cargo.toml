@@ -10,10 +10,8 @@ name = "tsa"
 path = "src/main.rs"
 
 [dependencies]
-tsa-axum = { workspace = true }
 tsa-core = { workspace = true }
 
-axum = { workspace = true }
 clap = { workspace = true }
 tokio = { workspace = true }
 reqwest = { workspace = true }
