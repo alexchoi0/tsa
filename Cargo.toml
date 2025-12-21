@@ -1,47 +1,47 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/tsa",
-    "crates/tsa-core",
-    "crates/tsa-token",
-    "crates/tsa-session",
-    "crates/tsa-oauth",
-    "crates/tsa-enterprise",
-    "crates/tsa-adapter",
-    "crates/tsa-adapter-seaorm",
-    "crates/tsa-adapter-redis",
-    "crates/tsa-adapter-mongodb",
-    "crates/tsa-adapter-dynamodb",
-    "crates/tsa-adapter-firestore",
-    "crates/tsa-adapter-bigtable",
-    "crates/tsa-axum",
-    "crates/tsa-cli",
+    "crates/tsa-auth",
+    "crates/tsa-auth-core",
+    "crates/tsa-auth-token",
+    "crates/tsa-auth-session",
+    "crates/tsa-auth-oauth",
+    "crates/tsa-auth-enterprise",
+    "crates/tsa-auth-adapter",
+    "crates/tsa-auth-adapter-seaorm",
+    "crates/tsa-auth-adapter-redis",
+    "crates/tsa-auth-adapter-mongodb",
+    "crates/tsa-auth-adapter-dynamodb",
+    "crates/tsa-auth-adapter-firestore",
+    "crates/tsa-auth-adapter-bigtable",
+    "crates/tsa-auth-axum",
+    "crates/tsa-auth-cli",
 ]
 
 [workspace.package]
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/yourusername/tsa"
+repository = "https://github.com/alexchoi0/tsa"
 keywords = ["auth", "authentication", "session", "token", "security"]
 categories = ["authentication", "web-programming"]
 
 [workspace.dependencies]
-tsa = { path = "crates/tsa" }
-tsa-core = { path = "crates/tsa-core" }
-tsa-token = { path = "crates/tsa-token" }
-tsa-session = { path = "crates/tsa-session" }
-tsa-adapter = { path = "crates/tsa-adapter" }
-tsa-oauth = { path = "crates/tsa-oauth" }
-tsa-enterprise = { path = "crates/tsa-enterprise" }
-tsa-adapter-seaorm = { path = "crates/tsa-adapter-seaorm" }
-tsa-adapter-redis = { path = "crates/tsa-adapter-redis" }
-tsa-adapter-mongodb = { path = "crates/tsa-adapter-mongodb" }
-tsa-adapter-dynamodb = { path = "crates/tsa-adapter-dynamodb" }
-tsa-adapter-firestore = { path = "crates/tsa-adapter-firestore" }
-tsa-adapter-bigtable = { path = "crates/tsa-adapter-bigtable" }
-tsa-axum = { path = "crates/tsa-axum" }
-tsa-cli = { path = "crates/tsa-cli" }
+tsa-auth = { path = "crates/tsa-auth" }
+tsa-auth-core = { path = "crates/tsa-auth-core" }
+tsa-auth-token = { path = "crates/tsa-auth-token" }
+tsa-auth-session = { path = "crates/tsa-auth-session" }
+tsa-auth-adapter = { path = "crates/tsa-auth-adapter" }
+tsa-auth-oauth = { path = "crates/tsa-auth-oauth" }
+tsa-auth-enterprise = { path = "crates/tsa-auth-enterprise" }
+tsa-auth-adapter-seaorm = { path = "crates/tsa-auth-adapter-seaorm" }
+tsa-auth-adapter-redis = { path = "crates/tsa-auth-adapter-redis" }
+tsa-auth-adapter-mongodb = { path = "crates/tsa-auth-adapter-mongodb" }
+tsa-auth-adapter-dynamodb = { path = "crates/tsa-auth-adapter-dynamodb" }
+tsa-auth-adapter-firestore = { path = "crates/tsa-auth-adapter-firestore" }
+tsa-auth-adapter-bigtable = { path = "crates/tsa-auth-adapter-bigtable" }
+tsa-auth-axum = { path = "crates/tsa-auth-axum" }
+tsa-auth-cli = { path = "crates/tsa-auth-cli" }
 
 thiserror = "2"
 redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
@@ -78,3 +78,4 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dirs = "5"
 rpassword = "7"
 anyhow = "1"
+toml = "0.8"

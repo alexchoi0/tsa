@@ -1,0 +1,16 @@
+[package]
+name = "tsa-auth-adapter"
+description = "Database and storage adapters for TSA"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tsa-auth-core.workspace = true
+thiserror.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+tokio.workspace = true
+paste = "1.0"

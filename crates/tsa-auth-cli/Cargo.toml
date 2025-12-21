@@ -1,0 +1,28 @@
+[package]
+name = "tsa-auth-cli"
+description = "CLI for TSA authentication system"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "tsa-auth"
+path = "src/main.rs"
+
+[dependencies]
+tsa-auth-core.workspace = true
+
+clap.workspace = true
+tokio.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+colored.workspace = true
+tabled.workspace = true
+dirs.workspace = true
+toml.workspace = true
+dotenvy = "0.15"
+dialoguer = "0.11"

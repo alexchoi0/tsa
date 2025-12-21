@@ -1,0 +1,21 @@
+[package]
+name = "tsa-auth-adapter-mongodb"
+description = "MongoDB adapter for TSA (Tokens, Sessions, Authentication)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tsa-auth-core.workspace = true
+tsa-auth-adapter.workspace = true
+async-trait.workspace = true
+paste = "1.0"
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+mongodb = "3"
+bson = { version = "2", features = ["uuid-1", "chrono-0_4", "serde_with"] }
+serde_bytes = "0.11"
+tokio.workspace = true
+futures = "0.3"
