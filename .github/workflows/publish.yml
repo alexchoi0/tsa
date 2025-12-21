@@ -1,9 +1,6 @@
 name: Publish to crates.io
 
 on:
-  pull_request:
-    types: [closed]
-    branches: [main]
   workflow_dispatch:
     inputs:
       dry_run:
@@ -18,7 +15,6 @@ env:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -83,7 +79,7 @@ jobs:
           git tag "v${{ steps.bump_version.outputs.new_version }}"
 
       - name: Publish crates
-        if: ${{ github.event_name == 'pull_request' || inputs.dry_run == false }}
+        if: ${{ inputs.dry_run == false }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
@@ -114,7 +110,7 @@ jobs:
           done
 
       - name: Dry run publish
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
+        if: ${{ inputs.dry_run == true }}
         run: |
           CRATES=(
             "tsa-auth-core"
@@ -140,13 +136,13 @@ jobs:
           done
 
       - name: Push changes
-        if: ${{ github.event_name == 'pull_request' || inputs.dry_run == false }}
+        if: ${{ inputs.dry_run == false }}
         run: |
           git push origin main
           git push origin "v${{ steps.bump_version.outputs.new_version }}"
 
       - name: Create GitHub Release
-        if: ${{ github.event_name == 'pull_request' || inputs.dry_run == false }}
+        if: ${{ inputs.dry_run == false }}
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.bump_version.outputs.new_version }}
