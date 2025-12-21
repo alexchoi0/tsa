@@ -1,0 +1,150 @@
+name: Publish to crates.io
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no actual publish)'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Get current version
+        id: current_version
+        run: |
+          VERSION=$(grep -m1 'version = "' Cargo.toml | sed 's/.*version = "\([^"]*\)".*/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+
+      - name: Bump minor version
+        id: bump_version
+        run: |
+          CURRENT="${{ steps.current_version.outputs.version }}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          NEW_MINOR=$((MINOR + 1))
+          NEW_VERSION="${MAJOR}.${NEW_MINOR}.0"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Bumping version: $CURRENT -> $NEW_VERSION"
+
+          # Update workspace version
+          sed -i "s/^version = \"$CURRENT\"/version = \"$NEW_VERSION\"/" Cargo.toml
+
+          # Verify the change
+          grep -m1 'version = "' Cargo.toml
+
+      - name: Update Cargo.lock
+        run: cargo update --workspace
+
+      - name: Verify build
+        run: cargo build --workspace --all-features
+
+      - name: Run tests
+        run: cargo test --workspace --all-features
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit version bump
+        run: |
+          git add Cargo.toml Cargo.lock
+          git commit -m "chore: bump version to ${{ steps.bump_version.outputs.new_version }}"
+          git tag "v${{ steps.bump_version.outputs.new_version }}"
+
+      - name: Publish crates
+        if: ${{ inputs.dry_run == false }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          # Publish in dependency order with delay between publishes
+          CRATES=(
+            "tsa-auth-core"
+            "tsa-auth-token"
+            "tsa-auth-session"
+            "tsa-auth-adapter"
+            "tsa-auth-oauth"
+            "tsa-auth-enterprise"
+            "tsa-auth-adapter-seaorm"
+            "tsa-auth-adapter-redis"
+            "tsa-auth-adapter-mongodb"
+            "tsa-auth-adapter-dynamodb"
+            "tsa-auth-adapter-firestore"
+            "tsa-auth-adapter-bigtable"
+            "tsa-auth"
+            "tsa-auth-axum"
+            "tsa-auth-cli"
+          )
+
+          for crate in "${CRATES[@]}"; do
+            echo "Publishing $crate..."
+            cargo publish -p "$crate" --no-verify
+            echo "Waiting for crates.io to index $crate..."
+            sleep 30
+          done
+
+      - name: Dry run publish
+        if: ${{ inputs.dry_run == true }}
+        run: |
+          CRATES=(
+            "tsa-auth-core"
+            "tsa-auth-token"
+            "tsa-auth-session"
+            "tsa-auth-adapter"
+            "tsa-auth-oauth"
+            "tsa-auth-enterprise"
+            "tsa-auth-adapter-seaorm"
+            "tsa-auth-adapter-redis"
+            "tsa-auth-adapter-mongodb"
+            "tsa-auth-adapter-dynamodb"
+            "tsa-auth-adapter-firestore"
+            "tsa-auth-adapter-bigtable"
+            "tsa-auth"
+            "tsa-auth-axum"
+            "tsa-auth-cli"
+          )
+
+          for crate in "${CRATES[@]}"; do
+            echo "Dry run: $crate"
+            cargo publish -p "$crate" --dry-run --no-verify
+          done
+
+      - name: Push changes
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          git push origin main
+          git push origin "v${{ steps.bump_version.outputs.new_version }}"
+
+      - name: Create GitHub Release
+        if: ${{ inputs.dry_run == false }}
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.bump_version.outputs.new_version }}
+          name: v${{ steps.bump_version.outputs.new_version }}
+          generate_release_notes: true
