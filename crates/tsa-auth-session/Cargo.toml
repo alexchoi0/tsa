@@ -1,0 +1,19 @@
+[package]
+name = "tsa-auth-session"
+description = "Session management for TSA"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+tsa-auth-core.workspace = true
+tsa-auth-token.workspace = true
+thiserror.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+rand.workspace = true
+sha2.workspace = true

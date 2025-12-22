@@ -1,0 +1,59 @@
+[package]
+name = "tsa-auth"
+description = "TSA - Tokens, Sessions, Authentication for Rust"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[features]
+default = ["oauth", "totp"]
+oauth = ["dep:tsa-auth-oauth"]
+totp = ["dep:totp-rs"]
+passkey = ["dep:webauthn-rs", "dep:webauthn-rs-proto"]
+enterprise = ["dep:tsa-auth-enterprise"]
+axum = ["dep:axum", "dep:axum-extra", "dep:tower", "dep:tower-http", "dep:http"]
+
+# Database adapters - if none specified, uses in-memory adapter
+adapter-seaorm = ["tsa-auth-adapter/seaorm"]
+adapter-seaorm-postgres = ["tsa-auth-adapter/seaorm-postgres"]
+adapter-seaorm-sqlite = ["tsa-auth-adapter/seaorm-sqlite"]
+adapter-mongodb = ["tsa-auth-adapter/mongodb"]
+adapter-dynamodb = ["tsa-auth-adapter/dynamodb"]
+adapter-firestore = ["tsa-auth-adapter/firestore"]
+adapter-bigtable = ["tsa-auth-adapter/bigtable"]
+adapter-redis = ["tsa-auth-adapter/redis"]
+
+[dependencies]
+tsa-auth-core.workspace = true
+tsa-auth-token.workspace = true
+tsa-auth-session.workspace = true
+tsa-auth-adapter.workspace = true
+
+argon2.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+rand.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+base64.workspace = true
+sha2.workspace = true
+hmac = "0.12"
+hex = "0.4"
+reqwest = { workspace = true }
+tracing = { workspace = true }
+
+tsa-auth-oauth = { workspace = true, optional = true }
+tsa-auth-enterprise = { workspace = true, optional = true }
+totp-rs = { workspace = true, optional = true }
+webauthn-rs = { workspace = true, optional = true }
+webauthn-rs-proto = { workspace = true, optional = true }
+axum = { workspace = true, optional = true }
+axum-extra = { workspace = true, optional = true }
+tower = { workspace = true, optional = true }
+tower-http = { workspace = true, optional = true }
+http = { workspace = true, optional = true }
