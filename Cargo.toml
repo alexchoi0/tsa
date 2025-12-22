@@ -28,21 +28,21 @@ keywords = ["auth", "authentication", "session", "token", "security"]
 categories = ["authentication", "web-programming"]
 
 [workspace.dependencies]
-tsa-auth = { path = "crates/tsa-auth" }
-tsa-auth-core = { path = "crates/tsa-auth-core" }
-tsa-auth-token = { path = "crates/tsa-auth-token" }
-tsa-auth-session = { path = "crates/tsa-auth-session" }
-tsa-auth-adapter = { path = "crates/tsa-auth-adapter" }
-tsa-auth-oauth = { path = "crates/tsa-auth-oauth" }
-tsa-auth-enterprise = { path = "crates/tsa-auth-enterprise" }
-tsa-auth-adapter-seaorm = { path = "crates/tsa-auth-adapter-seaorm" }
-tsa-auth-adapter-redis = { path = "crates/tsa-auth-adapter-redis" }
-tsa-auth-adapter-mongodb = { path = "crates/tsa-auth-adapter-mongodb" }
-tsa-auth-adapter-dynamodb = { path = "crates/tsa-auth-adapter-dynamodb" }
-tsa-auth-adapter-firestore = { path = "crates/tsa-auth-adapter-firestore" }
-tsa-auth-adapter-bigtable = { path = "crates/tsa-auth-adapter-bigtable" }
-tsa-auth-axum = { path = "crates/tsa-auth-axum" }
-tsa-auth-cli = { path = "crates/tsa-auth-cli" }
+tsa-auth = { version = "0.1.0", path = "crates/tsa-auth" }
+tsa-auth-core = { version = "0.1.0", path = "crates/tsa-auth-core" }
+tsa-auth-token = { version = "0.1.0", path = "crates/tsa-auth-token" }
+tsa-auth-session = { version = "0.1.0", path = "crates/tsa-auth-session" }
+tsa-auth-adapter = { version = "0.1.0", path = "crates/tsa-auth-adapter" }
+tsa-auth-oauth = { version = "0.1.0", path = "crates/tsa-auth-oauth" }
+tsa-auth-enterprise = { version = "0.1.0", path = "crates/tsa-auth-enterprise" }
+tsa-auth-adapter-seaorm = { version = "0.1.0", path = "crates/tsa-auth-adapter-seaorm" }
+tsa-auth-adapter-redis = { version = "0.1.0", path = "crates/tsa-auth-adapter-redis" }
+tsa-auth-adapter-mongodb = { version = "0.1.0", path = "crates/tsa-auth-adapter-mongodb" }
+tsa-auth-adapter-dynamodb = { version = "0.1.0", path = "crates/tsa-auth-adapter-dynamodb" }
+tsa-auth-adapter-firestore = { version = "0.1.0", path = "crates/tsa-auth-adapter-firestore" }
+tsa-auth-adapter-bigtable = { version = "0.1.0", path = "crates/tsa-auth-adapter-bigtable" }
+tsa-auth-axum = { version = "0.1.0", path = "crates/tsa-auth-axum" }
+tsa-auth-cli = { version = "0.1.0", path = "crates/tsa-auth-cli" }
 
 thiserror = "2"
 redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
