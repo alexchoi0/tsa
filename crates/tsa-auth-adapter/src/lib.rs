@@ -2,6 +2,24 @@ pub mod memory;
 
 pub use memory::*;
 
+#[cfg(feature = "seaorm")]
+pub mod seaorm;
+
+#[cfg(feature = "redis")]
+pub mod redis;
+
+#[cfg(feature = "mongodb")]
+pub mod mongodb;
+
+#[cfg(feature = "dynamodb")]
+pub mod dynamodb;
+
+#[cfg(feature = "firestore")]
+pub mod firestore;
+
+#[cfg(feature = "bigtable")]
+pub mod bigtable;
+
 #[macro_export]
 macro_rules! impl_adapter {
     ($adapter_name:ty, $prefix:ident) => {

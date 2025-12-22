@@ -7,12 +7,47 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 
+[features]
+default = []
+seaorm = ["dep:sea-orm", "dep:sea-orm-migration"]
+seaorm-postgres = ["seaorm"]
+seaorm-sqlite = ["seaorm"]
+redis = ["dep:redis"]
+mongodb = ["dep:mongodb", "dep:bson", "dep:serde_bytes", "dep:futures"]
+dynamodb = ["dep:aws-config", "dep:aws-sdk-dynamodb"]
+firestore = ["dep:gcloud-sdk", "dep:prost-types", "dep:tonic"]
+bigtable = ["dep:gcloud-sdk", "dep:tonic"]
+
 [dependencies]
 tsa-auth-core.workspace = true
 thiserror.workspace = true
 async-trait.workspace = true
 serde.workspace = true
+serde_json.workspace = true
 chrono.workspace = true
 uuid.workspace = true
 tokio.workspace = true
+base64.workspace = true
 paste = "1.0"
+
+# SeaORM
+sea-orm = { workspace = true, optional = true }
+sea-orm-migration = { workspace = true, optional = true }
+
+# Redis
+redis = { workspace = true, optional = true }
+
+# MongoDB
+mongodb = { version = "3", optional = true }
+bson = { version = "2", features = ["uuid-1", "chrono-0_4", "serde_with"], optional = true }
+serde_bytes = { version = "0.11", optional = true }
+futures = { version = "0.3", optional = true }
+
+# DynamoDB
+aws-config = { version = "1", optional = true }
+aws-sdk-dynamodb = { version = "1", optional = true }
+
+# Firestore & Bigtable (shared gcloud-sdk)
+gcloud-sdk = { version = "0.28", features = ["google-firestore-v1", "google-bigtable-v2"], optional = true }
+prost-types = { version = "0.13", optional = true }
+tonic = { version = "0.14", optional = true }
