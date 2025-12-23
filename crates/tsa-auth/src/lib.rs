@@ -66,20 +66,20 @@ pub mod adapter {
     pub use tsa_auth_adapter::*;
 
     #[cfg(feature = "adapter-seaorm")]
-    pub use tsa_auth_adapter_seaorm as seaorm;
+    pub use tsa_auth_adapter::seaorm;
 
     #[cfg(feature = "adapter-mongodb")]
-    pub use tsa_auth_adapter_mongodb as mongodb;
+    pub use tsa_auth_adapter::mongodb;
 
     #[cfg(feature = "adapter-dynamodb")]
-    pub use tsa_auth_adapter_dynamodb as dynamodb;
+    pub use tsa_auth_adapter::dynamodb;
 
     #[cfg(feature = "adapter-firestore")]
-    pub use tsa_auth_adapter_firestore as firestore;
+    pub use tsa_auth_adapter::firestore;
 
     #[cfg(feature = "adapter-bigtable")]
-    pub use tsa_auth_adapter_bigtable as bigtable;
+    pub use tsa_auth_adapter::bigtable;
 
     #[cfg(feature = "adapter-redis")]
-    pub use tsa_auth_adapter_redis as redis;
+    pub use tsa_auth_adapter::redis;
 }
