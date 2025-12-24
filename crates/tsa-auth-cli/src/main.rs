@@ -13,6 +13,9 @@ struct Cli {
 
     #[arg(short = 'c', long, global = true, env = "TSA_CONTEXT")]
     context: Option<String>,
+
+    #[arg(long, global = true, help = "Skip TLS verification (insecure)")]
+    insecure: bool,
 }
 
 #[derive(Subcommand)]
@@ -229,8 +232,10 @@ enum ConfigCommands {
     SetContext {
         #[arg(help = "Context name")]
         name: String,
-        #[arg(short, long, help = "Server URL")]
+        #[arg(short, long, help = "Server URL (e.g., http://localhost:50051)")]
         server: String,
+        #[arg(long, help = "Skip TLS verification for this context")]
+        insecure: bool,
     },
 
     #[command(about = "Switch to a context")]
@@ -290,12 +295,13 @@ async fn main() -> anyhow::Result<()> {
         cfg.use_context(ctx_name)?;
     }
 
-    let server_url = cfg.server_url().unwrap_or("http://localhost:3000");
+    let server_url = cfg.server_url().unwrap_or("http://localhost:50051");
     let token = cfg.token();
+    let insecure = cli.insecure || cfg.is_insecure();
 
     match cli.command {
         Commands::Auth { command } => {
-            let client = client::TsaClient::new(server_url, token);
+            let client = client::TsaClient::new(server_url, token, insecure);
             match command {
                 AuthCommands::Signup {
                     email,
@@ -316,7 +322,7 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::User { command } => {
-            let client = client::TsaClient::new(server_url, token);
+            let client = client::TsaClient::new(server_url, token, insecure);
             match command {
                 UserCommands::Me => {
                     commands::user::me(&client).await?;
@@ -330,7 +336,7 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Org { command } => {
-            let client = client::TsaClient::new(server_url, token);
+            let client = client::TsaClient::new(server_url, token, insecure);
             match command {
                 OrgCommands::List => {
                     commands::org::list(&client).await?;
@@ -370,7 +376,7 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Session { command } => {
-            let client = client::TsaClient::new(server_url, token);
+            let client = client::TsaClient::new(server_url, token, insecure);
             match command {
                 SessionCommands::List => {
                     commands::session::list(&client).await?;
@@ -384,7 +390,7 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::ApiKey { command } => {
-            let client = client::TsaClient::new(server_url, token);
+            let client = client::TsaClient::new(server_url, token, insecure);
             match command {
                 ApiKeyCommands::List => {
                     commands::apikey::list(&client).await?;
@@ -405,8 +411,12 @@ async fn main() -> anyhow::Result<()> {
             }
         }
         Commands::Config { command } => match command {
-            ConfigCommands::SetContext { name, server } => {
-                commands::config::set_context(&name, &server)?;
+            ConfigCommands::SetContext {
+                name,
+                server,
+                insecure,
+            } => {
+                commands::config::set_context(&name, &server, insecure)?;
             }
             ConfigCommands::UseContext { name } => {
                 commands::config::use_context(&name)?;
@@ -434,7 +444,7 @@ async fn main() -> anyhow::Result<()> {
             }
         },
         Commands::Health => {
-            let client = client::TsaClient::new(server_url, None);
+            let client = client::TsaClient::new(server_url, None, insecure);
             commands::health::check(&client).await?;
         }
     }

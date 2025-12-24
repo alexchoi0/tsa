@@ -9,6 +9,8 @@ pub struct Context {
     pub server_url: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub token: Option<String>,
+    #[serde(default)]
+    pub insecure: bool,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -65,14 +67,25 @@ impl CliConfig {
         self.current_context().and_then(|c| c.token.as_deref())
     }
 
+    pub fn is_insecure(&self) -> bool {
+        self.current_context().map(|c| c.insecure).unwrap_or(false)
+    }
+
     pub fn set_context(
         &mut self,
         name: &str,
         server_url: String,
         token: Option<String>,
+        insecure: bool,
     ) -> Result<()> {
-        self.contexts
-            .insert(name.to_string(), Context { server_url, token });
+        self.contexts.insert(
+            name.to_string(),
+            Context {
+                server_url,
+                token,
+                insecure,
+            },
+        );
         if self.current_context.is_none() {
             self.current_context = Some(name.to_string());
         }
@@ -117,6 +130,18 @@ impl CliConfig {
             .ok_or_else(|| anyhow!("No context selected. Use 'tsa config set-context' first."))?;
         if let Some(ctx) = self.contexts.get_mut(&ctx_name) {
             ctx.token = token;
+        }
+        self.save()
+    }
+
+    #[allow(dead_code)]
+    pub fn set_insecure(&mut self, insecure: bool) -> Result<()> {
+        let ctx_name = self
+            .current_context
+            .clone()
+            .ok_or_else(|| anyhow!("No context selected. Use 'tsa config set-context' first."))?;
+        if let Some(ctx) = self.contexts.get_mut(&ctx_name) {
+            ctx.insecure = insecure;
         }
         self.save()
     }

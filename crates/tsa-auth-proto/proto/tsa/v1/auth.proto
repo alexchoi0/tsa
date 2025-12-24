@@ -1,0 +1,67 @@
+syntax = "proto3";
+package tsa.v1;
+
+import "tsa/v1/common.proto";
+
+service AuthService {
+  rpc Signup(SignupRequest) returns (AuthResponse);
+  rpc Signin(SigninRequest) returns (AuthResponse);
+  rpc Signout(SignoutRequest) returns (MessageResponse);
+  rpc RefreshSession(RefreshSessionRequest) returns (RefreshSessionResponse);
+  rpc Setup2fa(Setup2faRequest) returns (TwoFactorSetupResponse);
+  rpc Verify2fa(Verify2faRequest) returns (MessageResponse);
+  rpc Disable2fa(Disable2faRequest) returns (MessageResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (MessageResponse);
+}
+
+message SignupRequest {
+  string email = 1;
+  string password = 2;
+  optional string name = 3;
+  optional string ip_address = 4;
+  optional string user_agent = 5;
+}
+
+message SigninRequest {
+  string email = 1;
+  string password = 2;
+  optional string ip_address = 3;
+  optional string user_agent = 4;
+}
+
+message SignoutRequest {}
+
+message RefreshSessionRequest {}
+
+message Setup2faRequest {}
+
+message Verify2faRequest {
+  string code = 1;
+}
+
+message Disable2faRequest {
+  string code = 1;
+}
+
+message ChangePasswordRequest {
+  string current_password = 1;
+  string new_password = 2;
+  bool revoke_other_sessions = 3;
+}
+
+message AuthResponse {
+  User user = 1;
+  Session session = 2;
+  string token = 3;
+}
+
+message RefreshSessionResponse {
+  Session session = 1;
+  string token = 2;
+}
+
+message TwoFactorSetupResponse {
+  string secret = 1;
+  string otpauth_url = 2;
+  repeated string backup_codes = 3;
+}

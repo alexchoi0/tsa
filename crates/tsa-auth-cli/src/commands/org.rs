@@ -1,52 +1,51 @@
 use anyhow::Result;
 use colored::Colorize;
-use serde::{Deserialize, Serialize};
 use tabled::{Table, Tabled};
 
-use crate::client::TsaClient;
+use tsa_auth_proto::{
+    timestamp_to_datetime, AddMemberRequest, CreateOrganizationRequest, DeleteOrganizationRequest,
+    GetOrganizationRequest, ListMembersRequest, ListOrganizationsRequest, RemoveMemberRequest,
+    UpdateMemberRequest as ProtoUpdateMemberRequest, UpdateOrganizationRequest,
+};
 
-#[derive(Deserialize, Tabled)]
-struct OrgResponse {
+use crate::client::{status_to_error, TsaClient};
+
+#[derive(Tabled)]
+struct OrgDisplay {
     id: String,
     name: String,
     slug: String,
-    #[tabled(skip)]
-    logo: Option<String>,
     created_at: String,
-}
-
-#[derive(Deserialize)]
-struct MemberResponse {
-    #[allow(dead_code)]
-    id: String,
-    user_id: String,
-    role: String,
-    user: Option<UserResponse>,
-    #[allow(dead_code)]
-    created_at: String,
-}
-
-#[derive(Deserialize)]
-struct UserResponse {
-    #[allow(dead_code)]
-    id: String,
-    email: String,
-    name: Option<String>,
-}
-
-#[derive(Deserialize)]
-struct MessageResponse {
-    #[allow(dead_code)]
-    message: String,
 }
 
 pub async fn list(client: &TsaClient) -> Result<()> {
-    let orgs: Vec<OrgResponse> = client.get("/organizations").await?;
+    let mut org_client = client.org_client().await?;
+    let request = client.auth_request(ListOrganizationsRequest {});
 
-    if orgs.is_empty() {
+    let response = org_client
+        .list_organizations(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    if response.organizations.is_empty() {
         println!("{}", "No organizations found".yellow());
         return Ok(());
     }
+
+    let orgs: Vec<OrgDisplay> = response
+        .organizations
+        .into_iter()
+        .map(|o| {
+            let created_at = timestamp_to_datetime(o.created_at);
+            OrgDisplay {
+                id: o.id,
+                name: o.name,
+                slug: o.slug,
+                created_at: created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
+            }
+        })
+        .collect();
 
     println!("{}", "Organizations".blue().bold());
     println!();
@@ -56,19 +55,22 @@ pub async fn list(client: &TsaClient) -> Result<()> {
     Ok(())
 }
 
-#[derive(Serialize)]
-struct CreateOrgRequest {
-    name: String,
-    slug: String,
-}
-
 pub async fn create(client: &TsaClient, name: &str, slug: &str) -> Result<()> {
-    let req = CreateOrgRequest {
+    let mut org_client = client.org_client().await?;
+
+    let inner = CreateOrganizationRequest {
         name: name.to_string(),
         slug: slug.to_string(),
     };
+    let request = client.auth_request(inner);
 
-    let org: OrgResponse = client.post("/organizations", &req).await?;
+    let response = org_client
+        .create_organization(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    let org = response.organization.unwrap();
 
     println!("{}", "Organization created successfully!".green().bold());
     println!();
@@ -80,7 +82,19 @@ pub async fn create(client: &TsaClient, name: &str, slug: &str) -> Result<()> {
 }
 
 pub async fn get(client: &TsaClient, slug: &str) -> Result<()> {
-    let org: OrgResponse = client.get(&format!("/organizations/{}", slug)).await?;
+    let mut org_client = client.org_client().await?;
+
+    let request = GetOrganizationRequest {
+        slug: slug.to_string(),
+    };
+
+    let response = org_client
+        .get_organization(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    let org = response.organization.unwrap();
 
     println!("{}", "Organization".blue().bold());
     println!();
@@ -90,17 +104,14 @@ pub async fn get(client: &TsaClient, slug: &str) -> Result<()> {
     if let Some(logo) = org.logo {
         println!("  {} {}", "Logo:".dimmed(), logo);
     }
-    println!("  {} {}", "Created:".dimmed(), org.created_at);
+    let created_at = timestamp_to_datetime(org.created_at);
+    println!(
+        "  {} {}",
+        "Created:".dimmed(),
+        created_at.format("%Y-%m-%d %H:%M:%S UTC")
+    );
 
     Ok(())
-}
-
-#[derive(Serialize)]
-struct UpdateOrgRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    logo: Option<String>,
 }
 
 pub async fn update(
@@ -109,12 +120,22 @@ pub async fn update(
     name: Option<&str>,
     logo: Option<&str>,
 ) -> Result<()> {
-    let req = UpdateOrgRequest {
+    let mut org_client = client.org_client().await?;
+
+    let inner = UpdateOrganizationRequest {
+        id: id.to_string(),
         name: name.map(|n| n.to_string()),
         logo: logo.map(|l| l.to_string()),
     };
+    let request = client.auth_request(inner);
 
-    let org: OrgResponse = client.put(&format!("/organizations/{}", id), &req).await?;
+    let response = org_client
+        .update_organization(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    let org = response.organization.unwrap();
 
     println!("{}", "Organization updated successfully!".green().bold());
     println!();
@@ -129,7 +150,15 @@ pub async fn update(
 }
 
 pub async fn delete(client: &TsaClient, id: &str) -> Result<()> {
-    let _: MessageResponse = client.delete(&format!("/organizations/{}", id)).await?;
+    let mut org_client = client.org_client().await?;
+
+    let inner = DeleteOrganizationRequest { id: id.to_string() };
+    let request = client.auth_request(inner);
+
+    org_client
+        .delete_organization(request)
+        .await
+        .map_err(status_to_error)?;
 
     println!("{}", "Organization deleted successfully!".green().bold());
 
@@ -137,11 +166,19 @@ pub async fn delete(client: &TsaClient, id: &str) -> Result<()> {
 }
 
 pub async fn members(client: &TsaClient, id: &str) -> Result<()> {
-    let members: Vec<MemberResponse> = client
-        .get(&format!("/organizations/{}/members", id))
-        .await?;
+    let mut org_client = client.org_client().await?;
 
-    if members.is_empty() {
+    let request = ListMembersRequest {
+        organization_id: id.to_string(),
+    };
+
+    let response = org_client
+        .list_members(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    if response.members.is_empty() {
         println!("{}", "No members found".yellow());
         return Ok(());
     }
@@ -149,7 +186,7 @@ pub async fn members(client: &TsaClient, id: &str) -> Result<()> {
     println!("{}", "Organization Members".blue().bold());
     println!();
 
-    for member in members {
+    for member in response.members {
         let email = member
             .user
             .as_ref()
@@ -173,30 +210,24 @@ pub async fn members(client: &TsaClient, id: &str) -> Result<()> {
     Ok(())
 }
 
-#[derive(Serialize)]
-struct AddMemberRequest {
-    user_id: String,
-    role: String,
-}
-
 pub async fn add_member(client: &TsaClient, org_id: &str, user_id: &str, role: &str) -> Result<()> {
-    let req = AddMemberRequest {
+    let mut org_client = client.org_client().await?;
+
+    let inner = AddMemberRequest {
+        organization_id: org_id.to_string(),
         user_id: user_id.to_string(),
         role: role.to_string(),
     };
+    let request = client.auth_request(inner);
 
-    let _: MemberResponse = client
-        .post(&format!("/organizations/{}/members", org_id), &req)
-        .await?;
+    org_client
+        .add_member(request)
+        .await
+        .map_err(status_to_error)?;
 
     println!("{}", "Member added successfully!".green().bold());
 
     Ok(())
-}
-
-#[derive(Serialize)]
-struct UpdateMemberRequest {
-    role: String,
 }
 
 pub async fn update_member(
@@ -205,16 +236,22 @@ pub async fn update_member(
     user_id: &str,
     role: &str,
 ) -> Result<()> {
-    let req = UpdateMemberRequest {
+    let mut org_client = client.org_client().await?;
+
+    let inner = ProtoUpdateMemberRequest {
+        organization_id: org_id.to_string(),
+        user_id: user_id.to_string(),
         role: role.to_string(),
     };
+    let request = client.auth_request(inner);
 
-    let member: MemberResponse = client
-        .put(
-            &format!("/organizations/{}/members/{}", org_id, user_id),
-            &req,
-        )
-        .await?;
+    let response = org_client
+        .update_member(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    let member = response.member.unwrap();
 
     println!("{}", "Member role updated successfully!".green().bold());
     println!();
@@ -225,9 +262,18 @@ pub async fn update_member(
 }
 
 pub async fn remove_member(client: &TsaClient, org_id: &str, user_id: &str) -> Result<()> {
-    let _: MessageResponse = client
-        .delete(&format!("/organizations/{}/members/{}", org_id, user_id))
-        .await?;
+    let mut org_client = client.org_client().await?;
+
+    let inner = RemoveMemberRequest {
+        organization_id: org_id.to_string(),
+        user_id: user_id.to_string(),
+    };
+    let request = client.auth_request(inner);
+
+    org_client
+        .remove_member(request)
+        .await
+        .map_err(status_to_error)?;
 
     println!("{}", "Member removed successfully!".green().bold());
 

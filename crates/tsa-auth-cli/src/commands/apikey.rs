@@ -1,12 +1,16 @@
 use anyhow::Result;
 use colored::Colorize;
-use serde::{Deserialize, Serialize};
 use tabled::{Table, Tabled};
 
-use crate::client::TsaClient;
+use tsa_auth_proto::{
+    timestamp_to_datetime, CreateApiKeyRequest, DeleteApiKeyRequest, ListApiKeysRequest,
+    UpdateApiKeyRequest as ProtoUpdateApiKeyRequest,
+};
 
-#[derive(Deserialize, Tabled)]
-struct ApiKeyResponse {
+use crate::client::{status_to_error, TsaClient};
+
+#[derive(Tabled)]
+struct ApiKeyDisplay {
     id: String,
     name: String,
     prefix: String,
@@ -31,25 +35,45 @@ fn display_option(opt: &Option<String>) -> String {
     opt.as_deref().unwrap_or("-").to_string()
 }
 
-#[derive(Deserialize)]
-struct ApiKeyCreatedResponse {
-    key: ApiKeyResponse,
-    secret: String,
-}
-
-#[derive(Deserialize)]
-struct MessageResponse {
-    #[allow(dead_code)]
-    message: String,
-}
-
 pub async fn list(client: &TsaClient) -> Result<()> {
-    let keys: Vec<ApiKeyResponse> = client.get("/users/me/api-keys").await?;
+    let mut apikey_client = client.apikey_client().await?;
+    let request = client.auth_request(ListApiKeysRequest {});
 
-    if keys.is_empty() {
+    let response = apikey_client
+        .list_api_keys(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    if response.api_keys.is_empty() {
         println!("{}", "No API keys found".yellow());
         return Ok(());
     }
+
+    let keys: Vec<ApiKeyDisplay> = response
+        .api_keys
+        .into_iter()
+        .map(|k| {
+            let created_at = timestamp_to_datetime(k.created_at);
+            let expires_at = k.expires_at.map(|t| {
+                let dt = timestamp_to_datetime(Some(t));
+                dt.format("%Y-%m-%d %H:%M:%S").to_string()
+            });
+            let last_used_at = k.last_used_at.map(|t| {
+                let dt = timestamp_to_datetime(Some(t));
+                dt.format("%Y-%m-%d %H:%M:%S").to_string()
+            });
+            ApiKeyDisplay {
+                id: k.id,
+                name: k.name,
+                prefix: k.prefix,
+                scopes: k.scopes,
+                expires_at,
+                last_used_at,
+                created_at: created_at.format("%Y-%m-%d %H:%M:%S").to_string(),
+            }
+        })
+        .collect();
 
     println!("{}", "API Keys".blue().bold());
     println!();
@@ -59,32 +83,34 @@ pub async fn list(client: &TsaClient) -> Result<()> {
     Ok(())
 }
 
-#[derive(Serialize)]
-struct CreateApiKeyRequest {
-    name: String,
-    scopes: Option<Vec<String>>,
-    expires_in_days: Option<i64>,
-}
-
 pub async fn create(
     client: &TsaClient,
     name: &str,
     scopes: Option<Vec<String>>,
     expires_days: Option<i64>,
 ) -> Result<()> {
-    let req = CreateApiKeyRequest {
+    let mut apikey_client = client.apikey_client().await?;
+
+    let inner = CreateApiKeyRequest {
         name: name.to_string(),
-        scopes,
+        scopes: scopes.unwrap_or_default(),
         expires_in_days: expires_days,
     };
+    let request = client.auth_request(inner);
 
-    let response: ApiKeyCreatedResponse = client.post("/users/me/api-keys", &req).await?;
+    let response = apikey_client
+        .create_api_key(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    let key = response.api_key.unwrap();
 
     println!("{}", "API key created successfully!".green().bold());
     println!();
-    println!("  {} {}", "ID:".dimmed(), response.key.id);
-    println!("  {} {}", "Name:".dimmed(), response.key.name);
-    println!("  {} {}", "Prefix:".dimmed(), response.key.prefix);
+    println!("  {} {}", "ID:".dimmed(), key.id);
+    println!("  {} {}", "Name:".dimmed(), key.name);
+    println!("  {} {}", "Prefix:".dimmed(), key.prefix);
     println!();
     println!(
         "  {} {}",
@@ -100,25 +126,28 @@ pub async fn create(
     Ok(())
 }
 
-#[derive(Serialize)]
-struct UpdateApiKeyRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    scopes: Option<Vec<String>>,
-}
-
 pub async fn update(
     client: &TsaClient,
     id: &str,
     name: Option<String>,
     scopes: Option<Vec<String>>,
 ) -> Result<()> {
-    let req = UpdateApiKeyRequest { name, scopes };
+    let mut apikey_client = client.apikey_client().await?;
 
-    let key: ApiKeyResponse = client
-        .put(&format!("/users/me/api-keys/{}", id), &req)
-        .await?;
+    let inner = ProtoUpdateApiKeyRequest {
+        id: id.to_string(),
+        name,
+        scopes: scopes.unwrap_or_default(),
+    };
+    let request = client.auth_request(inner);
+
+    let response = apikey_client
+        .update_api_key(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    let key = response.api_key.unwrap();
 
     println!("{}", "API key updated successfully!".green().bold());
     println!();
@@ -133,7 +162,15 @@ pub async fn update(
 }
 
 pub async fn delete(client: &TsaClient, id: &str) -> Result<()> {
-    let _: MessageResponse = client.delete(&format!("/users/me/api-keys/{}", id)).await?;
+    let mut apikey_client = client.apikey_client().await?;
+
+    let inner = DeleteApiKeyRequest { id: id.to_string() };
+    let request = client.auth_request(inner);
+
+    apikey_client
+        .delete_api_key(request)
+        .await
+        .map_err(status_to_error)?;
 
     println!("{}", "API key deleted successfully!".green().bold());
 

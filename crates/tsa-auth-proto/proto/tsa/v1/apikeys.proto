@@ -1,0 +1,42 @@
+syntax = "proto3";
+package tsa.v1;
+
+import "tsa/v1/common.proto";
+
+service ApiKeyService {
+  rpc ListApiKeys(ListApiKeysRequest) returns (ListApiKeysResponse);
+  rpc CreateApiKey(CreateApiKeyRequest) returns (CreateApiKeyResponse);
+  rpc UpdateApiKey(UpdateApiKeyRequest) returns (ApiKeyResponse);
+  rpc DeleteApiKey(DeleteApiKeyRequest) returns (MessageResponse);
+}
+
+message ListApiKeysRequest {}
+
+message ListApiKeysResponse {
+  repeated ApiKey api_keys = 1;
+}
+
+message CreateApiKeyRequest {
+  string name = 1;
+  repeated string scopes = 2;
+  optional int64 expires_in_days = 3;
+}
+
+message CreateApiKeyResponse {
+  ApiKey api_key = 1;
+  string secret = 2;
+}
+
+message UpdateApiKeyRequest {
+  string id = 1;
+  optional string name = 2;
+  repeated string scopes = 3;
+}
+
+message DeleteApiKeyRequest {
+  string id = 1;
+}
+
+message ApiKeyResponse {
+  ApiKey api_key = 1;
+}

@@ -1,35 +1,10 @@
 use anyhow::Result;
 use colored::Colorize;
-use serde::{Deserialize, Serialize};
 
-use crate::client::TsaClient;
+use tsa_auth_proto::{GetCurrentUserRequest, SigninRequest, SignoutRequest, SignupRequest};
+
+use crate::client::{status_to_error, TsaClient};
 use crate::config::CliConfig;
-
-#[derive(Serialize)]
-struct SignupRequest {
-    email: String,
-    password: String,
-    name: Option<String>,
-}
-
-#[derive(Serialize)]
-struct SigninRequest {
-    email: String,
-    password: String,
-}
-
-#[derive(Deserialize)]
-struct AuthResponse {
-    user: UserResponse,
-    token: String,
-}
-
-#[derive(Deserialize)]
-struct UserResponse {
-    id: String,
-    email: String,
-    name: Option<String>,
-}
 
 pub async fn signup(
     client: &TsaClient,
@@ -37,13 +12,23 @@ pub async fn signup(
     password: &str,
     name: Option<&str>,
 ) -> Result<()> {
-    let req = SignupRequest {
+    let mut auth_client = client.auth_client().await?;
+
+    let request = SignupRequest {
         email: email.to_string(),
         password: password.to_string(),
         name: name.map(|n| n.to_string()),
+        ip_address: None,
+        user_agent: None,
     };
 
-    let response: AuthResponse = client.post("/auth/signup", &req).await?;
+    let response = auth_client
+        .signup(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    let user = response.user.unwrap();
 
     let mut config = CliConfig::load()?;
     let ctx_name = config
@@ -55,9 +40,9 @@ pub async fn signup(
     println!("{}", "Account created successfully!".green().bold());
     println!();
     println!("  {} {}", "Context:".dimmed(), ctx_name.cyan());
-    println!("  {} {}", "User ID:".dimmed(), response.user.id);
-    println!("  {} {}", "Email:".dimmed(), response.user.email);
-    if let Some(name) = response.user.name {
+    println!("  {} {}", "User ID:".dimmed(), user.id);
+    println!("  {} {}", "Email:".dimmed(), user.email);
+    if let Some(name) = user.name {
         println!("  {} {}", "Name:".dimmed(), name);
     }
 
@@ -65,12 +50,22 @@ pub async fn signup(
 }
 
 pub async fn signin(client: &TsaClient, email: &str, password: &str) -> Result<()> {
-    let req = SigninRequest {
+    let mut auth_client = client.auth_client().await?;
+
+    let request = SigninRequest {
         email: email.to_string(),
         password: password.to_string(),
+        ip_address: None,
+        user_agent: None,
     };
 
-    let response: AuthResponse = client.post("/auth/signin", &req).await?;
+    let response = auth_client
+        .signin(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    let user = response.user.unwrap();
 
     let mut config = CliConfig::load()?;
     let ctx_name = config
@@ -82,20 +77,21 @@ pub async fn signin(client: &TsaClient, email: &str, password: &str) -> Result<(
     println!("{}", "Signed in successfully!".green().bold());
     println!();
     println!("  {} {}", "Context:".dimmed(), ctx_name.cyan());
-    println!("  {} {}", "User ID:".dimmed(), response.user.id);
-    println!("  {} {}", "Email:".dimmed(), response.user.email);
+    println!("  {} {}", "User ID:".dimmed(), user.id);
+    println!("  {} {}", "Email:".dimmed(), user.email);
 
     Ok(())
 }
 
 pub async fn signout(client: &TsaClient) -> Result<()> {
-    #[derive(Deserialize)]
-    struct MessageResponse {
-        #[allow(dead_code)]
-        message: String,
-    }
+    let mut auth_client = client.auth_client().await?;
 
-    let _: MessageResponse = client.post("/auth/signout", &serde_json::json!({})).await?;
+    let request = client.auth_request(SignoutRequest {});
+
+    auth_client
+        .signout(request)
+        .await
+        .map_err(status_to_error)?;
 
     let mut config = CliConfig::load()?;
     let ctx_name = config
@@ -129,8 +125,12 @@ pub async fn status(client: &TsaClient) -> Result<()> {
         return Ok(());
     }
 
-    match client.get::<UserResponse>("/users/me").await {
-        Ok(user) => {
+    let mut user_client = client.user_client().await?;
+    let request = client.auth_request(GetCurrentUserRequest {});
+
+    match user_client.get_current_user(request).await {
+        Ok(response) => {
+            let user = response.into_inner().user.unwrap();
             println!("{}", "Signed in".green().bold());
             println!();
             println!("  {} {}", "User ID:".dimmed(), user.id);

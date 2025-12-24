@@ -1,0 +1,21 @@
+[package]
+name = "tsa-auth-proto"
+description = "Protocol buffer definitions for TSA authentication"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+tsa-auth-core.workspace = true
+tonic.workspace = true
+tonic-prost = "0.14"
+prost.workspace = true
+prost-types.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+http-body = "1"
+bytes = "1"
+http = "1"
+tower-service = "0.3"

@@ -1,0 +1,20 @@
+syntax = "proto3";
+package tsa.v1;
+
+import "tsa/v1/common.proto";
+
+service UserService {
+  rpc GetCurrentUser(GetCurrentUserRequest) returns (UserResponse);
+  rpc UpdateCurrentUser(UpdateCurrentUserRequest) returns (UserResponse);
+}
+
+message GetCurrentUserRequest {}
+
+message UpdateCurrentUserRequest {
+  optional string name = 1;
+  optional string phone = 2;
+}
+
+message UserResponse {
+  User user = 1;
+}

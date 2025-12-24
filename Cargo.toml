@@ -8,7 +8,8 @@ members = [
     "crates/tsa-auth-oauth",
     "crates/tsa-auth-enterprise",
     "crates/tsa-auth-adapter",
-    "crates/tsa-auth-axum",
+    "crates/tsa-auth-proto",
+    "crates/tsa-auth-grpc",
     "crates/tsa-auth-cli",
 ]
 
@@ -29,9 +30,13 @@ tsa-auth-session = { version = "0.1.2", path = "crates/tsa-auth-session" }
 tsa-auth-adapter = { version = "0.1.2", path = "crates/tsa-auth-adapter" }
 tsa-auth-oauth = { version = "0.1.2", path = "crates/tsa-auth-oauth" }
 tsa-auth-enterprise = { version = "0.1.2", path = "crates/tsa-auth-enterprise" }
-tsa-auth-axum = { version = "0.1.2", path = "crates/tsa-auth-axum" }
+tsa-auth-proto = { version = "0.1.2", path = "crates/tsa-auth-proto" }
+tsa-auth-grpc = { version = "0.1.2", path = "crates/tsa-auth-grpc" }
 tsa-auth-cli = { version = "0.1.2", path = "crates/tsa-auth-cli" }
 
+tonic = "0.14"
+prost = "0.14"
+prost-types = "0.14"
 thiserror = "2"
 redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
 async-trait = "0.1"

@@ -1,0 +1,22 @@
+syntax = "proto3";
+package tsa.v1;
+
+import "tsa/v1/common.proto";
+
+service SessionService {
+  rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse);
+  rpc RevokeSession(RevokeSessionRequest) returns (MessageResponse);
+  rpc RevokeAllSessions(RevokeAllSessionsRequest) returns (MessageResponse);
+}
+
+message ListSessionsRequest {}
+
+message ListSessionsResponse {
+  repeated Session sessions = 1;
+}
+
+message RevokeSessionRequest {
+  string session_id = 1;
+}
+
+message RevokeAllSessionsRequest {}

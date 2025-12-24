@@ -8,17 +8,21 @@ repository.workspace = true
 authors.workspace = true
 
 [[bin]]
-name = "tsa-auth"
+name = "tsa"
 path = "src/main.rs"
 
 [dependencies]
 tsa-auth-core.workspace = true
+tsa-auth-proto = { version = "0.1.2", path = "../tsa-auth-proto" }
 
+tonic = { workspace = true, features = ["tls-ring", "tls-native-roots", "transport", "channel"] }
+prost.workspace = true
+prost-types.workspace = true
 clap.workspace = true
 tokio.workspace = true
-reqwest.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+chrono.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 anyhow.workspace = true

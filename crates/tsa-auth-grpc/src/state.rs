@@ -2,17 +2,17 @@ use std::sync::Arc;
 use tsa_auth::{Auth, AuthConfig, NoopCallbacks};
 use tsa_auth_adapter::InMemoryAdapter;
 
-use crate::config::ServerConfig;
+use crate::config::GrpcConfig;
 
 pub type AuthInstance = Auth<InMemoryAdapter, NoopCallbacks>;
 
 pub struct AppState {
-    pub config: ServerConfig,
+    pub config: GrpcConfig,
     pub auth: AuthInstance,
 }
 
 impl AppState {
-    pub async fn new(config: ServerConfig) -> anyhow::Result<Self> {
+    pub async fn new(config: GrpcConfig) -> anyhow::Result<Self> {
         let adapter = InMemoryAdapter::new();
         let auth_config = AuthConfig::new().app_name(&config.app_name);
         let auth = Auth::new(adapter, auth_config, NoopCallbacks);

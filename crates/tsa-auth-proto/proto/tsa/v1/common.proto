@@ -1,0 +1,61 @@
+syntax = "proto3";
+package tsa.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message User {
+  string id = 1;
+  string email = 2;
+  bool email_verified = 3;
+  optional string phone = 4;
+  bool phone_verified = 5;
+  optional string name = 6;
+  optional string image = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message Session {
+  string id = 1;
+  string user_id = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  google.protobuf.Timestamp created_at = 4;
+  optional string ip_address = 5;
+  optional string user_agent = 6;
+}
+
+message Organization {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+  optional string logo = 4;
+  optional string role = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message Member {
+  string id = 1;
+  string organization_id = 2;
+  string user_id = 3;
+  string role = 4;
+  optional User user = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message ApiKey {
+  string id = 1;
+  string user_id = 2;
+  optional string organization_id = 3;
+  string name = 4;
+  string prefix = 5;
+  repeated string scopes = 6;
+  optional google.protobuf.Timestamp expires_at = 7;
+  optional google.protobuf.Timestamp last_used_at = 8;
+  google.protobuf.Timestamp created_at = 9;
+}
+
+message MessageResponse {
+  string message = 1;
+}

@@ -1,0 +1,74 @@
+syntax = "proto3";
+package tsa.v1;
+
+import "tsa/v1/common.proto";
+
+service OrganizationService {
+  rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse);
+  rpc CreateOrganization(CreateOrganizationRequest) returns (OrganizationResponse);
+  rpc GetOrganization(GetOrganizationRequest) returns (OrganizationResponse);
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (OrganizationResponse);
+  rpc DeleteOrganization(DeleteOrganizationRequest) returns (MessageResponse);
+  rpc ListMembers(ListMembersRequest) returns (ListMembersResponse);
+  rpc AddMember(AddMemberRequest) returns (MemberResponse);
+  rpc UpdateMember(UpdateMemberRequest) returns (MemberResponse);
+  rpc RemoveMember(RemoveMemberRequest) returns (MessageResponse);
+}
+
+message ListOrganizationsRequest {}
+
+message ListOrganizationsResponse {
+  repeated Organization organizations = 1;
+}
+
+message CreateOrganizationRequest {
+  string name = 1;
+  string slug = 2;
+}
+
+message GetOrganizationRequest {
+  string slug = 1;
+}
+
+message UpdateOrganizationRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string logo = 3;
+}
+
+message DeleteOrganizationRequest {
+  string id = 1;
+}
+
+message OrganizationResponse {
+  Organization organization = 1;
+}
+
+message ListMembersRequest {
+  string organization_id = 1;
+}
+
+message ListMembersResponse {
+  repeated Member members = 1;
+}
+
+message AddMemberRequest {
+  string organization_id = 1;
+  string user_id = 2;
+  string role = 3;
+}
+
+message UpdateMemberRequest {
+  string organization_id = 1;
+  string user_id = 2;
+  string role = 3;
+}
+
+message RemoveMemberRequest {
+  string organization_id = 1;
+  string user_id = 2;
+}
+
+message MemberResponse {
+  Member member = 1;
+}

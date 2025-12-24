@@ -1,22 +1,23 @@
 use anyhow::Result;
 use colored::Colorize;
-use serde::{Deserialize, Serialize};
 
-use crate::client::TsaClient;
+use tsa_auth_proto::{
+    timestamp_to_datetime, ChangePasswordRequest, GetCurrentUserRequest, UpdateCurrentUserRequest,
+};
 
-#[derive(Deserialize)]
-struct UserResponse {
-    id: String,
-    email: String,
-    email_verified: bool,
-    phone: Option<String>,
-    phone_verified: bool,
-    name: Option<String>,
-    created_at: String,
-}
+use crate::client::{status_to_error, TsaClient};
 
 pub async fn me(client: &TsaClient) -> Result<()> {
-    let user: UserResponse = client.get("/users/me").await?;
+    let mut user_client = client.user_client().await?;
+    let request = client.auth_request(GetCurrentUserRequest {});
+
+    let response = user_client
+        .get_current_user(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    let user = response.user.unwrap();
 
     println!("{}", "Current User".blue().bold());
     println!();
@@ -46,26 +47,32 @@ pub async fn me(client: &TsaClient) -> Result<()> {
     if let Some(name) = user.name {
         println!("  {} {}", "Name:".dimmed(), name);
     }
-    println!("  {} {}", "Created:".dimmed(), user.created_at);
+    let created_at = timestamp_to_datetime(user.created_at);
+    println!(
+        "  {} {}",
+        "Created:".dimmed(),
+        created_at.format("%Y-%m-%d %H:%M:%S UTC")
+    );
 
     Ok(())
 }
 
-#[derive(Serialize)]
-struct UpdateUserRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    phone: Option<String>,
-}
-
 pub async fn update(client: &TsaClient, name: Option<&str>, phone: Option<&str>) -> Result<()> {
-    let req = UpdateUserRequest {
+    let mut user_client = client.user_client().await?;
+
+    let inner = UpdateCurrentUserRequest {
         name: name.map(|n| n.to_string()),
         phone: phone.map(|p| p.to_string()),
     };
+    let request = client.auth_request(inner);
 
-    let user: UserResponse = client.put("/users/me", &req).await?;
+    let response = user_client
+        .update_current_user(request)
+        .await
+        .map_err(status_to_error)?
+        .into_inner();
+
+    let user = response.user.unwrap();
 
     println!("{}", "User updated successfully!".green().bold());
     println!();
@@ -81,25 +88,20 @@ pub async fn update(client: &TsaClient, name: Option<&str>, phone: Option<&str>)
     Ok(())
 }
 
-#[derive(Serialize)]
-struct ChangePasswordRequest {
-    current_password: String,
-    new_password: String,
-}
-
-#[derive(Deserialize)]
-struct MessageResponse {
-    #[allow(dead_code)]
-    message: String,
-}
-
 pub async fn change_password(client: &TsaClient, current: &str, new: &str) -> Result<()> {
-    let req = ChangePasswordRequest {
+    let mut auth_client = client.auth_client().await?;
+
+    let inner = ChangePasswordRequest {
         current_password: current.to_string(),
         new_password: new.to_string(),
+        revoke_other_sessions: false,
     };
+    let request = client.auth_request(inner);
 
-    let _: MessageResponse = client.put("/auth/password", &req).await?;
+    auth_client
+        .change_password(request)
+        .await
+        .map_err(status_to_error)?;
 
     println!("{}", "Password changed successfully!".green().bold());
 

@@ -3,12 +3,15 @@ use colored::Colorize;
 
 use crate::config::CliConfig;
 
-pub fn set_context(name: &str, server_url: &str) -> Result<()> {
+pub fn set_context(name: &str, server_url: &str, insecure: bool) -> Result<()> {
     let mut config = CliConfig::load()?;
-    config.set_context(name, server_url.to_string(), None)?;
+    config.set_context(name, server_url.to_string(), None, insecure)?;
 
     println!("{} Context '{}' created", "✓".green(), name.cyan());
     println!("  {} {}", "server_url:".dimmed(), server_url);
+    if insecure {
+        println!("  {} {}", "insecure:".dimmed(), "true".yellow());
+    }
 
     Ok(())
 }
@@ -58,6 +61,9 @@ pub fn get_contexts() -> Result<()> {
                 "(not set)".yellow().to_string()
             }
         );
+        if ctx.insecure {
+            println!("    {} {}", "insecure:".dimmed(), "true".yellow());
+        }
     }
 
     Ok(())
@@ -132,6 +138,9 @@ pub fn show() -> Result<()> {
                         "(not set)".yellow().to_string()
                     }
                 );
+                if ctx.insecure {
+                    println!("  {}: {}", "Insecure".cyan(), "true".yellow());
+                }
             }
         }
         None => {
@@ -151,7 +160,7 @@ pub fn init() -> Result<()> {
     let mut config = CliConfig::load()?;
 
     if config.contexts.is_empty() {
-        config.set_context("default", "http://localhost:3000".to_string(), None)?;
+        config.set_context("default", "http://localhost:50051".to_string(), None, false)?;
     }
 
     println!("{}", "Configuration initialized!".green().bold());

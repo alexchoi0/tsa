@@ -1,0 +1,33 @@
+[package]
+name = "tsa-auth-grpc"
+description = "gRPC server for TSA authentication"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "tsa-server"
+path = "src/main.rs"
+
+[dependencies]
+tsa-auth = { workspace = true, features = ["totp"] }
+tsa-auth-core.workspace = true
+tsa-auth-adapter.workspace = true
+tsa-auth-proto = { version = "0.1.2", path = "../tsa-auth-proto" }
+
+tonic = { workspace = true, features = ["tls-ring", "tls-native-roots", "transport"] }
+prost.workspace = true
+prost-types.workspace = true
+tokio = { workspace = true, features = ["full", "rt-multi-thread"] }
+
+serde.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+tracing.workspace = true
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+thiserror.workspace = true
+async-trait.workspace = true
+anyhow.workspace = true
+dotenvy = "0.15"
